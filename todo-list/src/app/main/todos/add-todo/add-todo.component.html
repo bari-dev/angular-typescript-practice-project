@@ -1,0 +1,30 @@
+<h2 class="text-center">New Todo</h2>
+<div class="card">
+  <div class="card-body">
+    <form (submit)="createTodo()">
+      <div class="mb-3">
+        <input type="text" ngModel #title="ngModel" required class="form-control" placeholder="Enter Title">
+        <div id="titleHelp" class="form-text" *ngIf="title.invalid">Please enter a title.</div>
+      </div>
+      <div class="mb-3">
+        <textarea type="text" required class="form-control" ngModel #description="ngModel" placeholder="Enter Description"></textarea>
+        <div id="descriptionHelp" class="form-text" *ngIf="description.invalid">Please enter a description.</div>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Todo</button>
+    </form>
+  </div>
+</div>
+
+<!-- <mat-card class="my-5 p-5">
+  <form class="flex flex-col gap-4" (submit)="onSubmit(postForm)" #postForm="ngForm">
+    <mat-form-field>
+      <input matInput ngModel type="text" placeholder="Post Title" name="title" required #title="ngModel">
+      <mat-error *ngIf="title.invalid">Please enter a title.</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea  matInput row="6" ngModel type="text" placeholder="Posst Content" name="content" required #content="ngModel"></textarea>
+      <mat-error *ngIf="content.invalid">Please enter a Content.</mat-error>
+    </mat-form-field>
+    <button mat-raised-button class="w-fit self-center" color="primary">Submit</button>
+  </form>
+</mat-card> -->

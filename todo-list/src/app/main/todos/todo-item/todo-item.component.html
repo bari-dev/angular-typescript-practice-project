@@ -1,0 +1,13 @@
+<div class="border border-dark p-4 rounded-full">
+  <h3>{{todo.title}}</h3>
+  <p>{{todo.description}}</p>
+  <p>
+    <span class="badge" [ngClass]="todo.completed ? 'bg-success' : 'bg-warning'">
+      {{todo.completed ? 'Completed' : 'Pending'}}
+    </span>
+  </p>
+  <div class="actions">
+    <!-- <button class="mx-2 btn btn-primary" (click)="onEditTodo()">Edit</button> -->
+    <button class="btn btn-danger" (click)="todoDelete()">Delete</button>
+  </div>
+</div>
