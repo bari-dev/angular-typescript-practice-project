@@ -26,7 +26,7 @@ export class TodosComponent {
       description: 'This is the third todo',
       completed: false
     }
-  ];
+  ].reverse();
 
   deleteTodo(todo: Todo) {
     this.todos = this.todos.filter(t => t.id !== todo.id);
