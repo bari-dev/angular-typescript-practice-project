@@ -1,0 +1,31 @@
+
+
+GET http://localhost:3000/api/v1/posts
+
+###
+
+POST http://localhost:3000/api/v1/posts HTTP/1.1
+Content-Type: "application/json"
+
+{
+  title: "Post 1",
+  content: "This is the post no 1.",
+}
+
+###
+PUT http://localhost:3000/api/v1/posts HTTP/1.1
+Content-Type: "application/json"
+
+{
+  id: "1",
+  title: "Post 1",
+  content: "Update the Post no 1.",
+}
+
+###
+DELETE http://localhost:3000/api/v1/posts HTTP/1.1
+Content-Type: "application/json"
+
+{
+  id: "1"
+}
