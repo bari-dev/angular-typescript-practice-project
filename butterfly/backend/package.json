@@ -9,7 +9,7 @@
     "db:migrate": "sequelize-cli db:migrate",
     "db:rollback": "sequelize-cli db:migrate:undo",
     "db:seed": "sequelize-cli db:seed:all",
-    "db:model_create": "sequelize-cli migration:create --name"
+    "db:create_migration": "sequelize-cli migration:create --name"
   },
   "keywords": [],
   "author": "",
