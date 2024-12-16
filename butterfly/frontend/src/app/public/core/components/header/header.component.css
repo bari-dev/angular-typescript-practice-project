@@ -1,8 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap');
+.blurred-bottom-border::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: inherit;
+  filter: blur(5px);
+  z-index: -1;
+}
 
-.gochi-hand-regular {
-  font-family: "Gochi Hand", cursive;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 50px;
+.mat-mdc-menu-content {
+  padding: 0;
 }

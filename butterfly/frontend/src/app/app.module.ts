@@ -1,17 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
 import { PublicModule } from './public/public.module';
-// import { PublicComponent } from './public/public.component';
-// import { PublicComponent } from './public/public.component';
-// import { AuthenticationComponent } from './authentication/authentication.component';
-// import { LoginComponent } from './authentication/login/login.component';
-// import { SignupComponent } from './authentication/signup/signup.component';
-// import { ForgotPasswordComponent } from './authentication/forgot-password/forgot-password.component';
+import { AuthService } from './core/services/auth.service';
+import { PortalModule } from '@angular/cdk/portal';
 
 @NgModule({
   declarations: [
@@ -23,8 +18,11 @@ import { PublicModule } from './public/public.module';
     BrowserAnimationsModule,
     FormsModule,
     PublicModule,
+    PortalModule
   ],
-  providers: [],
+  providers: [
+    AuthService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

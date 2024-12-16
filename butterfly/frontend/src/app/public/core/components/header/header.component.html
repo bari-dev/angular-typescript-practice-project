@@ -1,12 +1,33 @@
-<mat-toolbar class='p-3' color="primary">
+<mat-toolbar class='p-3 blurred-bottom-border' color="primary">
   <mat-toolbar-row class="flex justify-between align-middle">
     <span class="gochi-hand-regular">Todoist</span>
     <span>
-      <button mat-raised-button class="bg-[#FFF]">
-        Login
-      </button>
-      <mat-icon class="example-icon">favorite</mat-icon>
-      <mat-icon class="example-icon">delete</mat-icon>
+      <span class="hidden md:block">
+        <button (click)='redirectToAnotherPage("login")' mat-raised-button class="mr-4 text-2xl px-4 py-2" style="border-radius: 30px">
+          Login
+        </button>
+        <button (click)='redirectToAnotherPage("signup")' mat-raised-button class="text-2xl px-4 py-2" style="border-radius: 30px">
+          Register
+        </button>
+      </span>
+      
+      <span class="block md:hidden bg-[#333]">
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" color="#FFF" style="padding: 0;">
+          <div style="background-color: rgb(255, 255, 255); padding: 0;">
+            <span class="flex flex-col gap-[5px] align-middle content-center justify-center">
+              <button (click)='redirectToAnotherPage("login")' mat-raised-button class="m-1 text-[20px] p-2" style="border-radius: 30px">
+                Login
+              </button>
+              <button (click)='redirectToAnotherPage("signup")' mat-raised-button class="m-1 text-[20px] p-2" style="border-radius: 30px">
+                Register
+              </button>
+            </span>
+          </div>
+        </mat-menu>
+      </span>
     </span>
   </mat-toolbar-row>
 </mat-toolbar>
