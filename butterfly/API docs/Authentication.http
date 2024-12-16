@@ -1,0 +1,29 @@
+
+
+# Example
+# POST https://example.com/comments HTTP/1.1
+# content-type: application/json
+
+# {
+#     "name": "sample",
+#     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+# }
+
+### SignUp
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+{
+  "firstName": "Abdul",
+  "lastName": "Khaliq",
+  "email": "abdul@example.com",
+  "password": "123456789"
+}
+
+### Login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+{
+  "email": "abdul@example.com",
+  "password": "123456789"
+}
+

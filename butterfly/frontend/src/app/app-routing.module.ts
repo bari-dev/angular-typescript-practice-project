@@ -12,7 +12,6 @@ const routes: Routes = [
   {
     path: 'public',
     component: PublicComponent,
-    pathMatch: 'full'
   },
   {
     path: '',

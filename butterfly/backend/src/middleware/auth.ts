@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../interfaces/user';
+import { verifyToken } from '../utils/jwt';
+import UserInterface from 'interfaces/user';
 
-const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
-  if (!token) return res.status(401).send('Access Denied');
+export const authenticate: any = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
-  jwt.verify(token, process.env.JWT_SECRET!, (err, user) => {
-    if (err) return res.status(403).send('Invalid Token');
-    next();
-  });
+  const decoded = verifyToken(token);
+  if (!decoded) return res.status(401).json({ message: 'Invalid token' });
+
+  req.user = decoded;
+  next();
 };
-
-export default authenticateToken;

@@ -1,40 +1,64 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import { Sequelize } from 'sequelize';
-import sequelizeConnection from '../config/database';
-import User from '../interfaces/user';
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../config/database';
 
-interface UserCreationAttributes extends Optional<User, 'id'> {}
+class User extends Model {
+    public id!: number;
+    public firstName!: string;
+    public lastName!: string;
+    public email!: string;
+    public password!: string;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
 
-class UserModel extends Model<User, UserCreationAttributes> implements User {
-  public id!: number;
-  public username!: string;
-  public email!: string;
-  public password!: string;
+    static associate(models: any) {
+        User.hasMany(models.TaskList, { foreignKey: 'userId' });
+        User.belongsToMany(models.TaskList, {
+            through: models.TaskListUser,
+            foreignKey: 'userId',
+        });
+        User.hasMany(models.Task, { foreignKey: 'assignedToUserId' });
+    }
 }
 
-const User = sequelizeConnection.define<UserModel>('User', {
-  id: {
-    type: DataTypes.INTEGER.UNSIGNED,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'users',
-  timestamps: false,
-});
-
+User.init(
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+        },
+        firstName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        lastName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize,
+        tableName: 'Users',
+        modelName: 'User',
+    }
+);
 
 export default User;
