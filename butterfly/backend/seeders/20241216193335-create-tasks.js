@@ -13,8 +13,8 @@ module.exports = {
         description: 'Buy fruits and vegetables for the week',
         completed: false,
         deadline: new Date('2024-12-20T12:00:00Z'),
-        task_list_id: taskListIds[0],
-        assigned_to_user_id: userIds[0],
+        taskListId: taskListIds[0],
+        assignedToUserId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -23,8 +23,8 @@ module.exports = {
         description: 'Complete the quarterly report for the company',
         completed: false,
         deadline: new Date('2024-12-25T12:00:00Z'),
-        task_list_id: taskListIds[1],
-        assigned_to_user_id: userIds[1],
+        taskListId: taskListIds[1],
+        assignedToUserId: userIds[1],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -33,8 +33,8 @@ module.exports = {
         description: 'Attend the weekly team sync',
         completed: true,
         deadline: new Date('2024-12-15T09:00:00Z'),
-        task_list_id: taskListIds[2],
-        assigned_to_user_id: userIds[2],
+        taskListId: taskListIds[2],
+        assignedToUserId: userIds[2],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -43,8 +43,8 @@ module.exports = {
         description: 'Review code for the new feature in Project X',
         completed: false,
         deadline: new Date('2024-12-22T18:00:00Z'),
-        task_list_id: taskListIds[3],
-        assigned_to_user_id: userIds[0],
+        taskListId: taskListIds[3],
+        assignedToUserId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       }

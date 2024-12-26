@@ -1,0 +1,38 @@
+<mat-sidenav-container class="mat-sidenav-container">
+  <mat-sidenav
+    mode="side"
+    [opened]="isLockedOpen"
+    class="mat-sidenav-left"
+    role="navigation"
+  >
+    <mat-toolbar class="mat-tall mat-hue-2" fxLayout="row" fxLayoutAlign="end end">
+      <div class="toolbar-tools" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+        <mat-icon>{{ data.user.icon }}</mat-icon>
+        <div fxLayout="column">
+          <span class="mat-body-2">{{ data.user.name }}</span><br />
+          <span class="mat-caption">{{ data.user.email }}</span>
+        </div>
+        <span fxFlex></span>
+      </div>
+    </mat-toolbar>
+    <div class="mt-10">
+      <mat-nav-list>
+        <div *ngFor="let section of data.sidenav.sections">
+          <mat-list-item (click)="section.expand = !section.expand">
+            <p class="mat-subheader mat-primary mt-20">{{ section.name }}</p>
+            <span fxFlex></span>
+            <mat-icon>{{ section.expand ? 'arrow_drop_up' : 'arrow_drop_down' }}</mat-icon>
+          </mat-list-item>
+          <ng-container *ngIf="section.expand">
+            <mat-list-item *ngFor="let action of section.actions" (click)="toast(action.link)">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <p class="mat-body-2">{{ action.name }}</p>
+              <span fxFlex></span>
+              <mat-icon>chevron_right</mat-icon>
+            </mat-list-item>
+          </ng-container>
+        </div>
+      </mat-nav-list>
+    </div>
+  </mat-sidenav>
+</mat-sidenav-container>

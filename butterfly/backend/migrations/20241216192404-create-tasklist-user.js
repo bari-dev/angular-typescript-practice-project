@@ -3,20 +3,26 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('TaskListUser', {
-      user_id: {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', // Reference to Users table
+          model: 'Users',
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
-      task_list_id: {
+      taskListId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'TaskLists', // Reference to TaskLists table
+          model: 'TaskLists',
           key: 'id'
         },
         onDelete: 'CASCADE'
@@ -31,11 +37,10 @@ module.exports = {
       }
     });
 
-    // Adding composite unique key to ensure no duplicate associations
     await queryInterface.addConstraint('TaskListUser', {
-      fields: ['user_id', 'task_list_id'],
+      fields: ['userId', 'taskListId'],
       type: 'unique',
-      name: 'unique_user_task_list'
+      name: 'uniqueUserTaskList'
     });
   },
 

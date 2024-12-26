@@ -23,20 +23,20 @@ module.exports = {
       deadline: {
         type: Sequelize.DATE
       },
-      task_list_id: {
+      taskListId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'TaskLists', // Reference to TaskLists table
+          model: 'TaskLists',
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
-      assigned_to_user_id: {
+      assignedToUserId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', // Reference to Users table
+          model: 'Users',
           key: 'id'
         },
         onDelete: 'CASCADE'

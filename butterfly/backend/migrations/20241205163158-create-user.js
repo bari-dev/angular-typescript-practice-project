@@ -2,7 +2,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Creating the Users table
     await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
@@ -36,12 +35,10 @@ module.exports = {
       }
     });
 
-    // Adding an index to the 'email' column
     await queryInterface.addIndex('Users', ['email']);
   },
 
   async down(queryInterface) {
-    // Dropping the Users table if we want to undo the migration
     await queryInterface.dropTable('Users');
   }
 };

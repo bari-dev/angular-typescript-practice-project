@@ -12,6 +12,7 @@ import { slideInAnimation } from '../animations';
 })
 export class PublicComponent {
   constructor(private contexts: ChildrenOutletContexts) {}
+
   
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];

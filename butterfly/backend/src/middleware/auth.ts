@@ -2,13 +2,36 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 import UserInterface from 'interfaces/user';
 
-export const authenticate: any = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+declare global {
+  namespace Express {
+    export interface Request {
+      user?: UserInterface;
+    }
+  }
+}
 
-  const decoded = verifyToken(token);
-  if (!decoded) return res.status(401).json({ message: 'Invalid token' });
+const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+    const authHeader = req.headers.authorization;
+    console.log(authHeader);
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ message: 'Unauthorized: No token provided' });
+      return;
+    }
 
-  req.user = decoded;
-  next();
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+
+    if (!decoded) {
+      res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      return;
+    }
+
+    req.user = decoded as UserInterface;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
+
+export default authenticateUser;

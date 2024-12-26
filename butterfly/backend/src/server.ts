@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import tasklistRoutes from './routes/tasklistRoutes';
+import forceRoutes from './routes/forceRoutes';
+import authenticateUser from './middleware/auth';
 
 dotenv.config();
 
@@ -17,8 +20,9 @@ const path = '/api/v1'
 
 // Routes
 app.use(`${path}/auth`, authRoutes);
-app.use(`${path}/users`, userRoutes);
-
+app.use(`${path}/users`, authenticateUser, userRoutes);
+app.use(`${path}/tasklists`, authenticateUser, tasklistRoutes);
+app.use(`${path}/force`, authenticateUser, forceRoutes);
 
 // Server
 app.listen(port, () => {

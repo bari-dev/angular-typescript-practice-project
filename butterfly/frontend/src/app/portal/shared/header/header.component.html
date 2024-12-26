@@ -1,0 +1,29 @@
+<mat-toolbar role="toolbar">
+  <div class="toolbar-tools flex justify-between w-screen">
+    <h4 class="mat-title">{{ data.title }}</h4>
+
+    <span>
+      <button *ngFor="let button of data.toolbar.buttons" mat-icon-button [attr.aria-label]="button.name" (click)="toast(button.link)">
+        <mat-icon>{{ button.icon }}</mat-icon>
+      </button>
+
+      <ng-container *ngFor="let menu of data.toolbar.menus">
+        <button mat-icon-button [attr.aria-label]="menu.name" [matMenuTriggerFor]="menuTrigger">
+          <mat-icon>{{ menu.icon }}</mat-icon>
+        </button>
+
+        <mat-menu #menuTrigger="matMenu">
+          <mat-menu disabled>
+            <mat-icon>{{ menu.icon }}</mat-icon>
+            <span>{{ menu.name }}</span>
+          </mat-menu>
+
+          <button mat-menu *ngFor="let action of menu.actions" (click)="toast(action.message)">
+            <mat-icon [ngClass]="action.error ? 'warn' : 'primary'">{{ action.completed ? 'done' : 'hourglass_empty' }}</mat-icon>
+            {{ action.name }}
+          </button>
+        </mat-menu>
+      </ng-container>
+    </span>
+  </div>
+</mat-toolbar>

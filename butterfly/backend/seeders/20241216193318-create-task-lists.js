@@ -8,31 +8,31 @@ module.exports = {
     await queryInterface.bulkInsert('TaskLists', [
       {
         name: 'Personal Tasks',
-        user_id: userIds[0],
+        userId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Work Tasks',
-        user_id: userIds[1],
+        userId: userIds[1],
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Shared Tasks',
-        user_id: userIds[2],
+        userId: userIds[2],
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Project X',
-        user_id: userIds[0],
+        userId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Project Y',
-        user_id: userIds[1],
+        userId: userIds[1],
         createdAt: new Date(),
         updatedAt: new Date()
       }

@@ -5,5 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nf start --port 8000"
+  },
+  "dependencies": {
+    "joi": "^17.13.3"
   }
 }
