@@ -1,10 +1,30 @@
+<!-- Header -->
 <portal-header></portal-header>
-<div id="container" class="flex w-full h-[100vh] bg-red-700">
-  <div id="sidebar" class="w-[200px] h-screen">
+
+<!-- Content -->
+<mat-drawer-container class="example-container">
+  <mat-drawer 
+    #drawer 
+    class="example-sidenav"
+    [mode]="isOpen ? 'side' : 'over'"
+    [opened]="isOpen"
+    >
     <portal-sidebar></portal-sidebar>
+  </mat-drawer>
+
+  <div class="example-sidenav-content">
+    <div class="w-screen" style="height: calc(100vh - 100px)">      
+      <!-- Menu Button for Sidebar -->
+      <button mat-icon-button (click)="drawer.toggle()" class="ms-[5]">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <div id="content" class="flex-1 p-4">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
   </div>
-  <div id="content" class="flex-1 p-4">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+</mat-drawer-container>
+
+<!-- Footer -->
 <portal-footer></portal-footer>

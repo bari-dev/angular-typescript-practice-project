@@ -3,6 +3,8 @@ import jsforce from 'jsforce';
 import User from '../models/user';
 import ForceInterface from '../interfaces/force';
 
+const { SF_USERNAME, SF_PASSWORD, SF_TOKEN, SF_BASE_URL } = process.env;
+
 class ForceController {
   async loginWithUsernamePassword(req: Request, res: Response): Promise<void> {
     const   user = req.user;
@@ -14,27 +16,27 @@ class ForceController {
     }
 
     const conn = new jsforce.Connection({
-      loginUrl: 'https://login.salesforce.com',
+      loginUrl: SF_BASE_URL,
     });
 
     try {
       const userInfo = await conn.login(username, password);
-      const force: ForceInterface;
-      // if (existingUser) {
-      //   await existingUser.update({
-      //     accessToken: conn.accessToken,
-      //     instanceUrl: conn.instanceUrl,
-      //     issuedAt: new Date(),
-      //   });
-      // } else {
-        // await User.create({
-        //   username,
-        //   password: password,
-        //   accessToken: conn.accessToken,
-        //   instanceUrl: conn.instanceUrl,
-        //   issuedAt: new Date(),
-        // });
-      // }
+      const existingUser = await User.findOne({ where: { username } });
+      if (existingUser) {
+        await existingUser!.update({
+          accessToken: conn.accessToken,
+          instanceUrl: conn.instanceUrl,
+          issuedAt: new Date(),
+        });
+      } else {
+        await User.create({
+          username,
+          password: password,
+          accessToken: conn.accessToken,
+          instanceUrl: conn.instanceUrl,
+          issuedAt: new Date(),
+        });
+      }
 
       res.status(200).json({
         message: 'Successfully logged into Salesforce.',
@@ -68,6 +70,13 @@ class ForceController {
         return;
       }
 
+      const force = user?.salesforce as any;
+ 
+      if (!force) {
+        res.status(404).json({ error: 'Salesforce credentials not found for user.' });
+        return;
+      }
+ 
       // Establish Salesforce connection
       const conn = new jsforce.Connection({
         instanceUrl: user.instanceUrl,

@@ -1,13 +1,12 @@
 <mat-toolbar role="toolbar">
   <div class="toolbar-tools flex justify-between w-screen">
     <h4 class="mat-title">{{ data.title }}</h4>
-
     <span>
       <button *ngFor="let button of data.toolbar.buttons" mat-icon-button [attr.aria-label]="button.name" (click)="toast(button.link)">
         <mat-icon>{{ button.icon }}</mat-icon>
       </button>
 
-      <ng-container *ngFor="let menu of data.toolbar.menus">
+      <!-- <ng-container *ngFor="let menu of data.toolbar.menus">
         <button mat-icon-button [attr.aria-label]="menu.name" [matMenuTriggerFor]="menuTrigger">
           <mat-icon>{{ menu.icon }}</mat-icon>
         </button>
@@ -23,7 +22,7 @@
             {{ action.name }}
           </button>
         </mat-menu>
-      </ng-container>
+      </ng-container> -->
     </span>
   </div>
 </mat-toolbar>

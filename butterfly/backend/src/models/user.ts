@@ -9,6 +9,9 @@ class User extends Model {
   public password!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  salesforce: any;
+  instanceUrl: string | undefined;
+  accessToken: string | undefined;
 
   static associate(models: any) {
     User.hasMany(models.TaskList, { foreignKey: 'userId' });

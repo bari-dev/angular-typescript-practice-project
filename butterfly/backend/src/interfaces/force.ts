@@ -5,6 +5,7 @@ interface ForceInterface {
   accessToken: string;
   refreshToken: string;
   instanceUrl: string;
+  userId: number;
   issueAt:   Date;
   createdAt: Date;
   updatedAt: Date;

@@ -1,2 +1,2 @@
-backend: cd backend && yarn dev --disable-host-check
-frontend: cd frontend && ng serve --host 0.0.0.0 --port 3001
+# backend: cd backend && yarn && yarn dev
+# frontend: cd frontend && yarn && ng s

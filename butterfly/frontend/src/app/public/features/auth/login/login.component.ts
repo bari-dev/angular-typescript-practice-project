@@ -9,17 +9,26 @@ import { AuthService } from 'src/app/core/services/auth.service';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigateByUrl('/dashboard');
+    } 
+  }
 
-  onSubmit(loginForm: NgForm) {
-    this.authService.login();
-    this.router.navigateByUrl('/');
-    // if (
-    //   loginForm.value.username === 'client' &&
-    //   loginForm.value.password === '123456789'
-    // ) {
-    // } else {
-    //   alert('Invalid username or password.');
-    // }
+  async onSubmit(loginForm: NgForm) {
+    const loginObj = {
+      email: loginForm.value.email,
+      password: loginForm.value.password,
+    };
+    if (
+      loginForm.value.email &&
+      loginForm.value.password
+    ) {
+      await this.authService.login(loginObj);
+      this.router.navigateByUrl('/dashboard');
+      
+    } else {
+      alert('Invalid username or password.');
+    }
   }
 }

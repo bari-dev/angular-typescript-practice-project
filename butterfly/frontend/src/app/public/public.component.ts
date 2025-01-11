@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { ChildrenOutletContexts } from '@angular/router';
+import { ChildrenOutletContexts, Router } from '@angular/router';
 import { slideInAnimation } from '../animations';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-public',
@@ -11,9 +12,12 @@ import { slideInAnimation } from '../animations';
   ]
 })
 export class PublicComponent {
-  constructor(private contexts: ChildrenOutletContexts) {}
+  constructor(private contexts: ChildrenOutletContexts, private router: Router, private _authService: AuthService) { 
+    if (this._authService.isAuthenticated()) {
+      this.router.navigateByUrl('/dashboard');
+    } 
+  }
 
-  
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
   }

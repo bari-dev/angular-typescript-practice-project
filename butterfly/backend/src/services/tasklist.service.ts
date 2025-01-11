@@ -15,8 +15,7 @@ class TaskListService {
   // Get all task lists for a user
   async getAllTaskLists(userId: number) {
     try {
-      const taskLists = await TaskList.findAll({ where: { userId } });
-      console.log(taskLists)
+      const taskLists = await TaskList.findAll({ where: { userId }, order: [['createdAt', 'DESC']] });
       return taskLists;
     } catch (error) {
       throw new Error('Error fetching task lists: ' + error);

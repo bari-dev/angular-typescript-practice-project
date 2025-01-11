@@ -11,10 +11,18 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import { MatMenuModule } from '@angular/material/menu';
 import { PortalModule } from './portal/portal.module';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { SubdomainComponent } from './subdomain/subdomain.component';
+import { CustomTableComponent } from './reusable/custom-table/custom-table.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    CustomTableComponent,
   ],
   imports: [
     BrowserModule,
@@ -26,10 +34,18 @@ import { PortalModule } from './portal/portal.module';
     MatButtonModule,
     MatMenuModule,
     PublicModule,
-    PortalModule
+    PortalModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule 
 ],
   providers: [
-    AuthService
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

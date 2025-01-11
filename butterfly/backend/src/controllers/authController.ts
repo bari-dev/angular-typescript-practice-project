@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import Joi from 'joi';
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const registerSchema = Joi.object({
   firstName: Joi.string().min(2).max(30).required().messages({

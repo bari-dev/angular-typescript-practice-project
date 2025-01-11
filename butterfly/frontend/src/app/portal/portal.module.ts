@@ -7,7 +7,6 @@ import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
 
 // material tags
-
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,15 +14,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
-// import { FlexLayoutModule } from '@angular/flex';
-
+import { MatCardModule } from '@angular/material/card';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { SalaeforceComponent } from './features/salaeforce/salaeforce.component';
+import { SettingsComponent } from './features/settings/settings.component';
 
 @NgModule({
   declarations: [
     PortalComponent,
     SidebarComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    DashboardComponent,
+    SalaeforceComponent,
+    SettingsComponent,
   ],
   exports: [PortalComponent],
   imports: [
@@ -40,7 +44,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatButtonModule,
     MatListModule,
     MatDividerModule,
-    // FlexLayoutModule
+    MatCardModule
   ]
 })
 export class PortalModule { }

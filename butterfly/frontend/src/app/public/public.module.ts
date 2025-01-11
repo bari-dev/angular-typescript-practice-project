@@ -13,6 +13,7 @@ import { HeroSectionComponent } from './features/home/hero-section/hero-section.
 import { InfoComponent } from './features/home/info/info.component';
 import { ContactUsComponent } from './features/home/contact-us/contact-us.component';
 import { AuthModule } from './features/auth/auth.module';
+import { PortalModule } from '../portal/portal.module';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { AuthModule } from './features/auth/auth.module';
     MatButtonModule,
     MatMenuModule,
     AuthModule,
+    PortalModule
   ]
 })
 export class PublicModule { }
