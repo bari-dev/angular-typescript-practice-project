@@ -20,14 +20,13 @@ export class ButterflyClientApi {
       },
     });
   }
-  
 
   async deleteTaskById(params: { id: number }): Promise<{ deleted: boolean }> {
     try {
       const response = await this.axiosInstance.delete(`/tasks/${params.id}`);
       return { deleted: response.data.deleted };
     } catch (error) {
-      console.error("Error deleting contact:", error);
+      console.log("Error deleting contact:", error);
       throw error;
     }
   }
@@ -37,7 +36,7 @@ export class ButterflyClientApi {
       const response = await this.axiosInstance.post(`/tasklists/${this._subdomainAuthService.getTasklist().slug}/tasks`, params);
       return { task: response.data.task };
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.log("Error creating task:", error);
       throw error;
     }
   }
@@ -47,7 +46,7 @@ export class ButterflyClientApi {
       const response = await this.axiosInstance.put(`/tasks/${params.task.id}`, params);
       return { task: response.data.task };
     } catch (error) {
-      console.error("Error editing task:", error);
+      console.log("Error editing task:", error);
       throw error;
     }
   }
@@ -57,7 +56,7 @@ export class ButterflyClientApi {
       const response = await this.axiosInstance.get(`/tasks?filter=${input}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.log("Error fetching tasks:", error);
       throw error;
     }
   }
@@ -67,8 +66,7 @@ export class ButterflyClientApi {
       const response = await this.axiosInstance.get(`/tasklists/${slug}/tasks`);
       return response.data;
     } catch (error) {
-      debugger;
-      console.error("Error fetching tasks:", error);
+      console.log("Error fetching tasks:", error);
       throw error;
     }
   }

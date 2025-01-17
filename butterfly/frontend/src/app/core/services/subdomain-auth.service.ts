@@ -9,16 +9,18 @@ const BASE_URL = `${env.apiBaseUrl}/subdomainAuth`;
   providedIn: 'root'
 })
 export class SubdomainAuthService {
-
-  private token: string | null = localStorage.getItem('token');
   isLoggedIn = false;
+  tasklistSlug: string = window.location.hostname.split('.')[0];
   
   constructor(private http: HttpClient) { }
 
   setUserAndToken(response: any): void {
-    localStorage.setItem('tasklist', JSON.stringify(response.tasklist));
-    localStorage.setItem('user', JSON.stringify(response.user));
-    localStorage.setItem('token', response.token);
+    localStorage.setItem(`${this.tasklistSlug}`, JSON.stringify({
+      tasklist: JSON.stringify(response.tasklist),
+      user: JSON.stringify(response.user),
+      token: response.token,
+      expireAt: new Date()
+    }));
   }
 
   login(loginData: any){
@@ -27,6 +29,7 @@ export class SubdomainAuthService {
       .toPromise()
       .then((response) => {
         if (response.token) {
+          this.tasklistSlug = response.tasklist.slug
           this.isLoggedIn = true;
           return response;
         } else {
@@ -39,29 +42,32 @@ export class SubdomainAuthService {
   }
 
   logout(){
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('tasklist');
+    localStorage.removeItem(`${this.tasklistSlug}_user`);
+    localStorage.removeItem(`${this.tasklistSlug}_token`);
+    localStorage.removeItem(`${this.tasklistSlug}_tasklist`);
     this.isLoggedIn = false;
   }
 
-  getToken(): string | null {
-    return this.token;
-  }
-
   getTasklist(): any {
-    const tasklist = localStorage.getItem('tasklist');
-    return tasklist ? JSON.parse(tasklist) : null;
+    return JSON.parse(this.loadLocalStorageHash()?.tasklist || null);
   }
 
   getUser(): UserInterface | null {
-    const u = localStorage.getItem('user');
+    return JSON.parse(this.loadLocalStorageHash()?.user || null);
+  }
+
+  getToken(): string | null {
+    return this.loadLocalStorageHash()?.token || null;
+  }
+  
+  isAuthenticated(): boolean {
+    return this.getToken() == null ? false : true;
+  }
+
+  loadLocalStorageHash(): any {
+    const u = localStorage.getItem(this.tasklistSlug);
     if (u) return JSON.parse(u);
 
     return null;
-  }
-
-  isAuthenticated(): boolean {
-    return localStorage.getItem('token') == null ? false : true;
   }
 }
