@@ -4,11 +4,11 @@
     <!-- User Info Card -->
     <mat-card appearance="outlined" class="mb-5 rounded-[30px]">
       <div class="toolbar-tools flex flex-col justify-center align-center">
-        <mat-icon class="text-[60px]">{{ data.user.icon }}</mat-icon>
+        <mat-icon class="text-[60px]">{{ data.user?.icon || 'account_circle' }}</mat-icon>
         <br />
         <div>
-          <span class="mat-body-2">{{ data.user.name }}</span><br />
-          <span class="mat-caption">{{ data.user.email }}</span>
+          <span class="mat-body-2">{{ data.user?.name }}</span><br />
+          <span class="mat-caption">{{ data.user?.email }}</span>
         </div>
       </div>
     </mat-card>

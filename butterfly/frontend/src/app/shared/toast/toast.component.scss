@@ -1,0 +1,36 @@
+.toast-container {
+  position: fixed;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 400px) and (max-width: 1200px) {
+  .toast-container {
+    width: 400px;
+    margin-left: -200px;
+    left: 50%;
+    transform: none;
+  }
+
+  .toast-container .slds-notify_container .slds-notify.slds-notify_toast {
+    min-width: 380px !important;
+  }
+}
+
+@media screen and (max-width: 399px) {
+  .toast-container {
+    width: 100%;
+    max-width: none;
+    left: 0;
+    transform: none;
+  }
+}
+
+.word-break {
+  word-break: break-word;
+}

@@ -1,0 +1,60 @@
+<div class="toast-container" *ngIf="showToast">
+  <div class="slds-notify_container slds-is-relative">
+    <div
+      [ngClass]="{
+        'slds-notify': true,
+        'slds-notify_toast': true,
+        'slds-theme_success': toastType === 'success',
+        'slds-theme_error': toastType === 'error'
+      }"
+      role="status"
+    >
+      <span class="slds-assistive-text">{{ toastType }}</span>
+      <span
+        class="slds-icon_container slds-icon-utility-{{
+          toastType
+        }} slds-m-right_small slds-no-flex slds-align-top"
+      >
+        <svg class="slds-icon slds-icon_small" aria-hidden="true">
+          <use
+            [attr.xlink:href]="
+              '/assets/icons/utility-sprite/svg/symbols.svg#' + toastType
+            "
+          ></use>
+        </svg>
+      </span>
+      <div class="slds-notify__content">
+        <div *ngIf="toastMessage.indexOf(',') !== -1; else elseBlock">
+          <h2 class="slds-text-heading_small">
+            {{ toastMessage.split(",")[0] }}
+          </h2>
+          <p class="word-break">
+            {{ toastMessage.split(",")[1] }}
+          </p>
+        </div>
+        <ng-template #elseBlock>
+          <p class="word-break">
+            {{ toastMessage }}
+          </p>
+        </ng-template>
+      </div>
+      <div class="slds-notify__close">
+        <button
+          class="slds-button slds-button_icon slds-button_icon-inverse"
+          title="Close"
+          (click)="closeToast()"
+        >
+          <svg
+            class="slds-button__icon slds-button__icon_large"
+            aria-hidden="true"
+          >
+            <use
+              xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"
+            ></use>
+          </svg>
+          <span class="slds-assistive-text">Close</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

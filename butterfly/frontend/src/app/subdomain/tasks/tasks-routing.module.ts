@@ -1,16 +1,14 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { TasksComponent } from './tasks.component';
+import { AddTaskComponent } from './add-task/add-task.component';
 
-const routes: Routes = [
+export default [
   {
     path: '',
-    component: TasksComponent
-  }
-];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class TasksRoutingModule { }
+    component: TasksComponent,
+  },
+  {
+    path: 'new',
+    component: AddTaskComponent,
+  },
+] as Routes;

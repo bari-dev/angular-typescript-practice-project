@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TasklistComponent } from './tasklist.component';
 import { TasklistRoutingModule } from './tasklist-routing.module';
@@ -29,7 +29,8 @@ import { MatSortModule } from '@angular/material/sort';
     MatTableModule,
     MatCardModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    DatePipe
   ]
 })
 export class TasklistModule { }

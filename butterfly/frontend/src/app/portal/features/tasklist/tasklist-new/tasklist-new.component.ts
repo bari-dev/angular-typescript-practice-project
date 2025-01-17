@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { env } from '../../../../../environments/environment';
+import { TasklistService } from 'src/app/core/services/tasklist.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
@@ -13,48 +10,43 @@ import { AuthService } from 'src/app/core/services/auth.service';
 })
 export class TasklistNewComponent {
   tasklistName: string = '';
-  apiUrl: string = `${env.apiBaseUrl}/tasklists`;  
-  authorizationToken: string | null = this.authService.getToken(); 
   errorMessage: string = ''; 
   successMessage: string = ''; 
+  isSubmitting: boolean = false;
 
-  constructor(private http: HttpClient, private location: Location, private authService: AuthService) { }
+  constructor(
+    private tasklistService: TasklistService, 
+    private location: Location,
+    private authService: AuthService
+  ) { }
 
   goBack(): void {
-    this.location.back();
+    this.location.back(); 
   }
 
   onSubmit(): void {
     if (this.tasklistName.trim()) {
-      const requestPayload = {
-        name: this.tasklistName
-      };
+      this.isSubmitting = true; 
 
-      const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authorizationToken}`);
+      const newTasklist = { name: this.tasklistName };
 
-      this.http.post(this.apiUrl, requestPayload, { headers })
-        .pipe(
-          catchError(error => {
-            console.error('Error occurred during the POST request:', error);
-            this.errorMessage = 'An error occurred while creating the TaskList. Please try again later.';
-            return of(error);
-          })
-        )
-        .subscribe(
-          (response) => {
-            console.log('TaskList created successfully:', response);
-            this.tasklistName = '';  
-            this.errorMessage = '';  
-            this.successMessage = 'TaskList created successfully!';  
-            this.goBack();
-          },
-          (error) => {
-            this.errorMessage = 'An error occurred while creating the TaskList. Please try again later.';
-            console.error('Error:', error);
-          }
-        );
+      
+      this.tasklistService.createTasklist(newTasklist).subscribe(
+        (response) => {
+          this.tasklistName = ''; 
+          this.errorMessage = ''; 
+          this.successMessage = 'TaskList created successfully!'; 
+          this.goBack(); 
+          this.isSubmitting = false; 
+        },
+        (error) => {
+          console.error('Error creating tasklist:', error); 
+          this.errorMessage = 'An error occurred while creating the task list.';
+          this.isSubmitting = false;
+        }
+      );
     } else {
-      this.errorMessage = 'TaskList Name is required!';
+      this.errorMessage = 'TaskList Name is required!'; 
     }
   }
 }

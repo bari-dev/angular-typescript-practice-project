@@ -1,46 +1,73 @@
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {MatSort, Sort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-];
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormsModule, NgModel } from '@angular/forms';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { TaskDetailsComponent } from './task-details/task-details.component';
+import { SubdomainAuthService } from '../../core/services/subdomain-auth.service';
+import TasklistInterface from '../../core/interfaces/models/tasklist.interface';
+import TaskDetailsInterface from '../../core/interfaces/models/tasklist.interface';
+import { TaskService } from './task.service';
+import { TaskInterface } from '../../core/interfaces/models/task.interface';
+import { MatDialog } from '@angular/material/dialog';
+import { AddTaskComponent } from './add-task/add-task.component';
 
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css'],
+  standalone: true,
+  imports: [
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    FormsModule,
+    CommonModule,
+    MatIconModule,
+    TaskDetailsComponent,
+    AddTaskComponent
+  ]
 })
 export class TasksComponent implements AfterViewInit, OnInit {
+  tasks: TaskInterface[] = [];
+  openModal: boolean = false;
+  isModalOpen: boolean = false;
+  selectedTask: TaskDetailsInterface | null = null;
+  selectedTaskDetails: TaskDetailsInterface | null = null;
+  tasklist: TasklistInterface;
+  showAlert: boolean = false;
+  alertMessage: string = '';
+  searchQuery: string = '';
+  currentPage: number = 1;
+  batchSize: number = 27;
+  total: number = 0;
+  searchResults: TaskInterface[] = [];
+  loading: boolean = false;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  dataSource = new MatTableDataSource<TaskInterface>;
   taskListSlug: string = '';
-  constructor(private _liveAnnouncer: LiveAnnouncer, private route: ActivatedRoute) {}
 
   @ViewChild(MatSort) sort: MatSort | null = null;
 
+  constructor(
+    private _liveAnnouncer: LiveAnnouncer,
+    private router: Router,
+    private _subdomainAuthService: SubdomainAuthService,
+    private _taskService: TaskService,
+    private dialog: MatDialog
+  ) {
+    if (!this._subdomainAuthService.isAuthenticated()) {
+      this.router.navigateByUrl('/');
+    }
+    this.tasklist = this._subdomainAuthService.getTasklist();
+  }
+
   ngOnInit(): void {
-    this.route.queryParams.subscribe(queryParams => {
-      this.taskListSlug = queryParams['tasklist'];
-    });
+    this.fetchTasks();
   }
 
   ngAfterViewInit() {
@@ -53,5 +80,59 @@ export class TasksComponent implements AfterViewInit, OnInit {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  triggerModal(task: TaskDetailsInterface) {
+    if (task) this.selectedTask = task;
+    else this.selectedTask = null;
+    this.openModal = true;
+  }
+
+  getLinkForName(task: TaskDetailsInterface) {}
+
+  onTaskClick(task: any) {
+    this.selectedTaskDetails = task;
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
+  async fetchTasks() {
+    this.loading = true;
+    try {
+      const tasks = await this._taskService.getTasks(this.tasklist.slug);
+      this.tasks = tasks;
+      console.log(tasks);
+      this.dataSource = new MatTableDataSource(tasks);
+    } catch (error) {
+      this.showAlert = true;
+      this.alertMessage = 'Error fetching tasks. Please try again later.';
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  onSearchQueryChange() {
+    this.fetchTasks();
+  }
+  
+  onLogout(): void {
+    this._subdomainAuthService.logout();
+    this.router.navigateByUrl('/');
+  }
+
+  openAddTaskModal(): void {
+    const dialogRef = this.dialog.open(AddTaskComponent, {
+      width: '400px',
+      data: {} // Optional: Pass data to the modal
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Task Created:', result);
+      }
+    });
   }
 }

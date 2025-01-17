@@ -13,6 +13,6 @@ router.put('/:taskListId', tasklistController.updateTaskList);
 router.delete('/:taskListId', tasklistController.deleteTaskList);
 
 // tasklist's tasks
-router.use('/:taskListId/tasks', tasklistMiddleware, taskRoutes);
+router.use('/:taskListSlug/tasks', tasklistMiddleware, taskRoutes);
 
 export default router;

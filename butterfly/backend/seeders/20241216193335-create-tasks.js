@@ -10,6 +10,7 @@ module.exports = {
     await queryInterface.bulkInsert('Tasks', [
       {
         title: 'Buy groceries',
+        slug: 'buy-groceries',
         description: 'Buy fruits and vegetables for the week',
         completed: false,
         deadline: new Date('2024-12-20T12:00:00Z'),
@@ -20,6 +21,7 @@ module.exports = {
       },
       {
         title: 'Finish report',
+        slug: 'finish-report',
         description: 'Complete the quarterly report for the company',
         completed: false,
         deadline: new Date('2024-12-25T12:00:00Z'),
@@ -30,6 +32,7 @@ module.exports = {
       },
       {
         title: 'Attend meeting',
+        slug: 'attend-meeting',
         description: 'Attend the weekly team sync',
         completed: true,
         deadline: new Date('2024-12-15T09:00:00Z'),
@@ -40,6 +43,7 @@ module.exports = {
       },
       {
         title: 'Complete code review',
+        slug: 'complete-code-review',
         description: 'Review code for the new feature in Project X',
         completed: false,
         deadline: new Date('2024-12-22T18:00:00Z'),

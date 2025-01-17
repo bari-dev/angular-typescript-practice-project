@@ -9,13 +9,8 @@ import { AuthService } from 'src/app/core/services/auth.service';
 })
 export class SidebarComponent implements OnInit {
   activeTab: string = '';
-
   data = {
-    user: {
-      icon: 'account_circle',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-    },
+    user: this.authService.getUser(),
     sidenav: {
       sections: [
         {

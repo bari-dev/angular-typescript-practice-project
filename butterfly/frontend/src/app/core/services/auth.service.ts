@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { LoginObject } from '../interfaces/login.interface';
 import { SignupObject } from '../interfaces/signup.interface';
 import { env } from 'src/environments/environment';
+import UserInterface from '../interfaces/models/user.interface';
 
 const BASE_URL = `${env.apiBaseUrl}/auth`;
 
@@ -17,41 +18,58 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  async login(loginObj: LoginObject) {
-    this.http.post(`${BASE_URL}/login`, loginObj).subscribe((res: any)=>{
-      if(res.token !== undefined) {
-        localStorage.setItem('token', res.token);
-        this.isLoggedIn = true;
-        return true;
-      } else {
-        alert(res.message);
-
-        return false;
-      }
-    })
+  login(credentials: { email: string; password: string }) {
+    return this.http
+      .post<any>(`${BASE_URL}/login`, credentials)
+      .toPromise()
+      .then((response) => {
+        if (response.token) {
+          this.setUserAndToken(response);
+          return response;
+        } else {
+          throw new Error('Login failed');
+        }
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 
-  signup(signupObj: SignupObject) {
-    this.http.post(`${BASE_URL}/register`, signupObj).subscribe((res: any)=>{
-      if(res.result) {
-        localStorage.setItem('token', res.token);
-        this.isLoggedIn = true;
-        return true;
-      } else {
-        alert(res.message);
+  signup(signupObj: SignupObject): Promise<any> {
+    return this.http.post(`${BASE_URL}/register`, signupObj).toPromise()
+      .then((response: any) => {
+        if (response.token) {
+          this.setUserAndToken(response);
+          return response;
+        } else {
+          return Promise.reject(new Error('SignUp failed'));
+        }
+      })
+      .catch((error) => {
+        return Promise.reject(error);
+      });
+  }
 
-        return false;
-      }
-    })
+  setUserAndToken(response: any): void {
+    localStorage.setItem('user', JSON.stringify(response.user));
+    localStorage.setItem('token', response.token);
   }
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.isLoggedIn = false;
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  getUser(): UserInterface | null {
+    const u = localStorage.getItem('user');
+    if (u) return JSON.parse(u);
+
+    return null;
   }
 
   isAuthenticated(): boolean {

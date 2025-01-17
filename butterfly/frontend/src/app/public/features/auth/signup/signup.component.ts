@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { last } from 'rxjs';
+import { last, of } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
@@ -10,25 +10,37 @@ import { AuthService } from 'src/app/core/services/auth.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
-  signupForm?: NgForm;
+  firstName: string = '';
+  lastName: string = '';
+  email: string = '';
+  password: string = '';
+  rememberMe: boolean = false;
+  errorMessage: string | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) { }
 
-  onSubmit(signupForm: NgForm) {
+  async onSubmit(signupForm: NgForm) {
     const signupObj = {
       firstName: signupForm.value.firstName,
       lastName: signupForm.value.lastName,
       email: signupForm.value.email,
       password: signupForm.value.password,
     };
-    if (
-      signupForm.value.email &&
-      signupForm.value.password
-    ) {
-      this.authService.signup(signupObj);
-      this.router.navigateByUrl('/dashboard');
+    if (signupForm.valid) {
+      this.errorMessage = null;
+      this.authService.signup(signupObj)
+        .then((response) => {
+          this.router.navigateByUrl('/dashboard');
+        })
+        .catch((error) => {
+          try {
+            this.errorMessage = error.error.message;
+          } catch (err: any) {
+            this.errorMessage = 'An unknown error occurred. Please try again later.';
+          }
+        });
     } else {
-      alert('Invalid username or password.');
+      this.errorMessage = 'Please fill out all required fields.';
     }
   }
 }

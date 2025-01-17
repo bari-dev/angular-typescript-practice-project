@@ -1,31 +1,50 @@
+import TasklistInterface from 'interfaces/tasklist';
 import TaskList from '../models/tasklist';
+import User from '../models/user';
+import { TasklistWithUserInterface } from 'interfaces/tasklistWithUser';
+import { UniqueConstraintError } from 'sequelize';
 
 class TaskListService {
-  // Create a new TaskList
-  async createTaskList(name: string, userId: number) {
+  async createTaskList(name: string, userId: number, slug: string) {
     try {
-      console.error(name, userId)
-      const taskList = await TaskList.create({ name, userId });
+      const taskList = await TaskList.create({ name, userId, slug });
       return taskList;
     } catch (error) {
-      throw new Error('Error creating task list: ' + error);
+      if(error instanceof UniqueConstraintError){
+        throw new Error(`Task is already present with ${name} name`);
+      }else{
+        throw new Error('Error creating task list: ' + error);
+      }
     }
   }
 
-  // Get all task lists for a user
   async getAllTaskLists(userId: number) {
     try {
-      const taskLists = await TaskList.findAll({ where: { userId }, order: [['createdAt', 'DESC']] });
+      const taskLists = await TaskList.findAll({ where: { userId }, order: [['createdAt', 'DESC']], include: [{
+        model: User,
+        as: 'creator',
+        attributes: ['id', 'firstName', 'lastName']
+      }] });
       return taskLists;
     } catch (error) {
       throw new Error('Error fetching task lists: ' + error);
     }
   }
 
-  // Get a task list by ID
-  async getTaskListById(taskListId: number) {
+  mapTasklistWithUserData(tasklist: any) {
+    console.log(tasklist);
+  }
+
+  async getTaskListById(taskListId: number): Promise<TasklistWithUserInterface> {
     try {
-      const taskList = await TaskList.findByPk(taskListId);
+      const taskList = await TaskList.findByPk(taskListId, {
+        include: [{
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'firstName', 'lastName']
+        }]
+      });
+      console.log(taskList);
       if (!taskList) throw new Error('Task list not found');
       return taskList;
     } catch (error) {
@@ -33,12 +52,11 @@ class TaskListService {
     }
   }
 
-  // Update a task list
   async updateTaskList(taskListId: number, name: string, userId: number) {
     try {
       const taskList = await TaskList.findByPk(taskListId);
       if (!taskList) throw new Error('Task list not found');
-      if(userId !== Number(taskList.userId)) throw new Error('You aren\'t the creator of this Task.');
+      if (userId !== Number(taskList.userId)) throw new Error('You aren\'t the creator of this Task.');
 
       taskList.name = name;
       await taskList.save();
@@ -48,12 +66,11 @@ class TaskListService {
     }
   }
 
-  // Delete a task list
   async deleteTaskList(taskListId: number, userId: number) {
     try {
       const taskList = await TaskList.findByPk(taskListId);
       if (!taskList) throw new Error('Task list not found');
-      if(userId !== Number(taskList.userId)) throw new Error('You aren\'t the creator of this Task.');
+      if (userId !== Number(taskList.userId)) throw new Error('You aren\'t the creator of this Task.');
 
       await taskList.destroy();
       return { message: 'Task list deleted successfully' };
@@ -61,6 +78,11 @@ class TaskListService {
       throw new Error('Error deleting task list: ' + error);
     }
   }
+
+  async findTaskListBySlug(slug: string) {
+    return TaskList.findOne({ where: { slug } });
+  }
+
 }
 
 export default new TaskListService();

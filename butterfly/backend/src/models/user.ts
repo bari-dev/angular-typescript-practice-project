@@ -1,5 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database';
+import TaskList from './tasklist';
+import Task from './task';
 
 class User extends Model {
   public id!: number;
@@ -13,13 +15,13 @@ class User extends Model {
   instanceUrl: string | undefined;
   accessToken: string | undefined;
 
-  static associate(models: any) {
-    User.hasMany(models.TaskList, { foreignKey: 'userId' });
-    User.belongsToMany(models.TaskList, {
-      through: models.TaskListUser,
-      foreignKey: 'userId',
-    });
-    User.hasMany(models.Task, { foreignKey: 'assignedToUserId' });
+  static associate() {
+    User.hasMany(TaskList, { foreignKey: 'userId', as: 'tasklists' });
+    // User.belongsToMany(TaskList, {
+    //   through: models.TaskListUser,
+    //   foreignKey: 'userId',
+    // });
+    User.hasMany(Task, { foreignKey: 'assignedToUserId' });
   }
 }
 

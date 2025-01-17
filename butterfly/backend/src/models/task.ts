@@ -4,6 +4,7 @@ import sequelize from '../config/database';
 class Task extends Model {
   public id!: number;
   public title!: string;
+  public slug!: string;
   public description?: string;
   public completed!: boolean;
   public deadline?: Date;
@@ -39,6 +40,11 @@ Task.init(
     },
     deadline: {
       type: DataTypes.DATE,
+    },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
     taskListId: {
       type: DataTypes.INTEGER,

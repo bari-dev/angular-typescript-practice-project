@@ -1,0 +1,62 @@
+<div class="max-w-lg mx-auto p-6 bg-[#212121] rounded-lg shadow-md">
+  <div class="flex justify-end items-end mb-6">
+    <button class="text-white bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-md font-semibold focus:outline-none" (click)="closeDialog()" class="text-white">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <h2 class="text-2xl font-semibold text-center mb-6 text-white">Create New Task</h2>
+
+  <form (ngSubmit)="onSubmit()" #taskForm="ngForm">
+    <div *ngIf="errorMessage" class="text-red-600 font-bold text-center bg-red-200">
+      <p class="p-2">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Task Title -->
+    <div class="mb-4">
+      <label for="taskTitle" class="block text-sm font-medium text-white mb-2">Task Title</label>
+      <input type="text" id="taskTitle" name="taskTitle" [(ngModel)]="taskTitle" #taskTitleInput="ngModel" required
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none"
+        placeholder="Enter the Task Title" />
+      <div *ngIf="taskTitleInput.invalid && taskTitleInput.touched" class="text-sm text-red-600 mt-2">
+        Task Title is required.
+      </div>
+    </div>
+
+    <!-- Task Description -->
+    <div class="mb-4">
+      <label for="taskDescription" class="block text-sm font-medium text-white mb-2">Task Description</label>
+      <textarea id="taskDescription" name="taskDescription" [(ngModel)]="taskDescription"
+        #taskDescriptionInput="ngModel" required rows="4"
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none"
+        placeholder="Enter the Task Description"></textarea>
+      <div *ngIf="taskDescriptionInput.invalid && taskDescriptionInput.touched" class="text-sm text-red-600 mt-2">
+        Task Description is required.
+      </div>
+    </div>
+
+    <!-- Task Completed -->
+    <div class="mb-4 flex items-center">
+      <label for="taskCompleted" class="text-sm font-medium text-white mr-2">Completed</label>
+      <input type="checkbox" id="taskCompleted" name="taskCompleted" [(ngModel)]="taskCompleted"/>
+    </div>
+
+    <!-- Task Deadline -->
+    <div class="mb-4">
+      <label for="taskDeadline" class="block text-sm font-medium text-white mb-2">Task Deadline</label>
+      <input type="datetime-local" id="taskDeadline" name="taskDeadline" [(ngModel)]="taskDeadline"
+        #taskDeadlineInput="ngModel" required [min]="currentDate"
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none" />
+      <div *ngIf="taskDeadlineInput.invalid && taskDeadlineInput.touched" class="text-sm text-red-600 mt-2">
+        Deadline is required and must be a future date.
+      </div>
+    </div>
+
+    <div class="flex justify-center">
+      <button type="submit" [disabled]="taskForm.invalid || isSubmitting"
+        class="w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-md hover:bg-blue-600 focus:outline-none disabled:bg-gray-400">
+        Create Task
+      </button>
+    </div>
+  </form>
+</div>

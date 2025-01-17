@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import TasklistInterface from 'src/app/core/interfaces/models/tasklist.interface';
 import { timeInterval } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-all-tasklist',
@@ -12,12 +13,14 @@ import { timeInterval } from 'rxjs';
 })
 export class AllTasklistComponent implements OnInit, AfterViewInit {
   tasklists: any[] = [];
-  displayedColumns: string[] = ['tasklistNumber', 'name', 'userId', 'createdAt', 'updatedAt', 'actions'];
+  displayedColumns: string[] = ['tasklistNumber', 'name', 'creator', 'createdAt', 'actions'];
+  currentUserId?: number;
   dataSource: MatTableDataSource<any>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private tasklistService: TasklistService) {
+  constructor(private tasklistService: TasklistService, private _authService: AuthService) {
     this.dataSource = new MatTableDataSource();
+    this.currentUserId = _authService.getUser()?.id;
   }
 
   ngOnInit(): void {
@@ -29,7 +32,7 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
   }
 
   openTaskListPage(tasklist: TasklistInterface): void {
-    const subdomain = tasklist.name.toLowerCase().replace(/\s/g, '-');
+    const subdomain = tasklist.slug;
     const url = `http://${subdomain}.localhost:4200`;
     window.open(url, '_blank');
   }
@@ -37,6 +40,7 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
   loadTasklists(): void {
     this.tasklistService.getTasklists().subscribe(
       (data: any) => {
+        console.log(data);
         this.tasklists = data;
         this.dataSource.data = this.tasklists;
       },

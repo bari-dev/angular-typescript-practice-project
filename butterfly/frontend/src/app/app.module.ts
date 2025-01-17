@@ -16,8 +16,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-import { SubdomainComponent } from './subdomain/subdomain.component';
-import { CustomTableComponent } from './reusable/custom-table/custom-table.component';
+import { CustomTableComponent } from './shared/custom-table/custom-table.component';
+import { SubLoginComponent } from './subdomain/sub-login/sub-login.component';
+import { TasksComponent } from './subdomain/tasks/tasks.component';
+import { RouterModule } from '@angular/router';
+import { TaskDetailsComponent } from './subdomain/tasks/task-details/task-details.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -29,6 +33,7 @@ import { CustomTableComponent } from './reusable/custom-table/custom-table.compo
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule,
+    RouterModule,
     MatIconModule,
     MatToolbarModule,
     MatButtonModule,
@@ -37,7 +42,14 @@ import { CustomTableComponent } from './reusable/custom-table/custom-table.compo
     PortalModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule 
+    MatSortModule,
+    MatDialogModule,
+
+    // Standalone
+    SubLoginComponent,
+    TasksComponent,
+    TaskDetailsComponent,
+
 ],
   providers: [
     AuthService,

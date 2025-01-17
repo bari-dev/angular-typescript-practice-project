@@ -12,7 +12,11 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+      },
+      slug: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       userId: {
         type: Sequelize.INTEGER,
@@ -32,9 +36,16 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+
+    await queryInterface.addConstraint('TaskLists', {
+      fields: ['userId', 'name'],
+      type: 'unique',
+      name: 'unique_user_tasklist_name'
+    });
   },
 
   async down(queryInterface) {
+    await queryInterface.removeConstraint('TaskLists', 'unique_user_tasklist_name');
     await queryInterface.dropTable('TaskLists');
   }
 };

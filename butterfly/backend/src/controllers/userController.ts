@@ -37,7 +37,6 @@ export const updateCurrentUser = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    // Update user data
     await user.update({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -45,7 +44,6 @@ export const updateCurrentUser = async (req: Request, res: Response): Promise<vo
       password: req.body.password,
     });
 
-    // Respond back with the updated user
     res.status(200).json({ message: 'User updated successfully', user });
   } catch (err) {
     console.error(err);

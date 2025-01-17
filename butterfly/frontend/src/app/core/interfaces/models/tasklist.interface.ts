@@ -1,8 +1,16 @@
+import { TaskInterface } from "./task.interface";
+
+interface TasklistUser {
+  id: number;
+  name: string;
+}
+
 interface TasklistInterface {
   id: number;
   name: string;
-  userId: number;
-//   tasks?: TaskInterface[];
+  creator: TasklistUser;
+  slug: string;
+  tasks?: TaskInterface[];
   createdAt: Date;
   updatedAt: Date;
 }

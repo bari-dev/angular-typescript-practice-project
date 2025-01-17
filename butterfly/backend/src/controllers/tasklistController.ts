@@ -2,25 +2,35 @@ import { Request, Response } from 'express';
 import TaskListService from '../services/tasklist.service';
 
 class TaskListController {
-  // Create Task List
   async createTaskList(req: Request, res: Response): Promise<void> {
     const name = req.body.name;
     const userId = req.user?.id;
+  
     try {
-      const taskList = await TaskListService.createTaskList(name, Number(userId));
+      let slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  
+      let existingTaskList = await TaskListService.findTaskListBySlug(slug);
+      
+      while (existingTaskList) {
+        const randomSuffix = Math.floor(10000 + Math.random() * 99999);
+        slug = `${slug}-${randomSuffix}`;
+  
+        existingTaskList = await TaskListService.findTaskListBySlug(slug);
+      }
+    
+      const taskList = await TaskListService.createTaskList(name, Number(userId), slug);
+  
       res.status(201).json(taskList);
-      return 
+      return;
     } catch (err) {
       res.status(500).json({ message: String(err) });
       return;
     }
   }
 
-  // Get all Task Lists for a user
   async getAllTaskLists(req: Request, res: Response): Promise<void> {
     const userId = req.user?.id;
     try {
-      console.log(userId)
       const taskLists = await TaskListService.getAllTaskLists(Number(userId));
       res.status(200).json(taskLists);
       return 
@@ -30,7 +40,6 @@ class TaskListController {
     }
   }
 
-  // Get Task List by ID
   async getTaskListById(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
     try {
@@ -43,7 +52,6 @@ class TaskListController {
     }
   }
 
-  // Update Task List
   async updateTaskList(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
     const { name } = req.body;
@@ -58,7 +66,6 @@ class TaskListController {
     }
   }
 
-  // Delete Task List
   async deleteTaskList(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
     const userId   = req.user?.id;
