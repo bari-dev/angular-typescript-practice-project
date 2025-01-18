@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('TaskListUser', {
+    await queryInterface.createTable('TaskUser', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,19 +13,24 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'User',
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
-      taskListId: {
+      taskId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'TaskLists',
+          model: 'Task',
           key: 'id'
         },
         onDelete: 'CASCADE'
+      },
+      permission: {
+        type: Sequelize.ENUM('admin', 'editor', 'viewer'),
+        allowNull: false,
+        defaultValue: 'viewer'
       },
       createdAt: {
         allowNull: false,
@@ -37,14 +42,15 @@ module.exports = {
       }
     });
 
-    await queryInterface.addConstraint('TaskListUser', {
-      fields: ['userId', 'taskListId'],
+    await queryInterface.addConstraint('TaskUser', {
+      fields: ['userId', 'taskId'],
       type: 'unique',
-      name: 'uniqueUserTaskList'
+      name: 'uniqueUserTask'
     });
   },
 
-  async down(queryInterface) {
-    await queryInterface.dropTable('TaskListUser');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('TaskUser');    
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_TaskUsers_permission";');
   }
 };

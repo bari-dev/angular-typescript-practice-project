@@ -2,12 +2,12 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const taskLists = await queryInterface.sequelize.query('SELECT id from `TaskLists`');
-    const users = await queryInterface.sequelize.query('SELECT id from `Users`');
+    const taskLists = await queryInterface.sequelize.query('SELECT id from `TaskList`');
+    const users = await queryInterface.sequelize.query('SELECT id from `User`');
     const taskListIds = taskLists[0].map(taskList => taskList.id);
     const userIds = users[0].map(user => user.id);
 
-    await queryInterface.bulkInsert('Tasks', [
+    await queryInterface.bulkInsert('Task', [
       {
         title: 'Buy groceries',
         slug: 'buy-groceries',
@@ -15,7 +15,7 @@ module.exports = {
         completed: false,
         deadline: new Date('2024-12-20T12:00:00Z'),
         taskListId: taskListIds[0],
-        assignedToUserId: userIds[0],
+        creatorId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -26,7 +26,7 @@ module.exports = {
         completed: false,
         deadline: new Date('2024-12-25T12:00:00Z'),
         taskListId: taskListIds[1],
-        assignedToUserId: userIds[1],
+        creatorId: userIds[1],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -37,7 +37,7 @@ module.exports = {
         completed: true,
         deadline: new Date('2024-12-15T09:00:00Z'),
         taskListId: taskListIds[2],
-        assignedToUserId: userIds[2],
+        creatorId: userIds[2],
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -48,7 +48,18 @@ module.exports = {
         completed: false,
         deadline: new Date('2024-12-22T18:00:00Z'),
         taskListId: taskListIds[3],
-        assignedToUserId: userIds[0],
+        creatorId: userIds[0],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        title: 'On Production',
+        slug: 'on-production',
+        description: 'Review code for the new feature in Project X',
+        completed: false,
+        deadline: new Date('2024-12-22T18:00:00Z'),
+        taskListId: taskListIds[3],
+        creatorId: userIds[0],
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -56,6 +67,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.bulkDelete('Tasks', null, {});
+    await queryInterface.bulkDelete('Task', null, {});
   }
 };

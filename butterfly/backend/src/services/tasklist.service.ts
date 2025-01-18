@@ -35,7 +35,7 @@ class TaskListService {
     console.log(tasklist);
   }
 
-  async getTaskListById(taskListId: number): Promise<TasklistWithUserInterface> {
+  async getTaskListById(taskListId: number): Promise<any> {
     try {
       const taskList = await TaskList.findByPk(taskListId, {
         include: [{

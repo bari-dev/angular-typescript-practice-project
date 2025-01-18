@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('TaskLists', {
+    await queryInterface.createTable('TaskList', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -18,11 +18,11 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      userId: {
+      creatorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'User',
           key: 'id'
         },
         onDelete: 'CASCADE'
@@ -37,15 +37,15 @@ module.exports = {
       }
     });
 
-    await queryInterface.addConstraint('TaskLists', {
-      fields: ['userId', 'name'],
+    await queryInterface.addConstraint('TaskList', {
+      fields: ['creatorId', 'name'],
       type: 'unique',
       name: 'unique_user_tasklist_name'
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.removeConstraint('TaskLists', 'unique_user_tasklist_name');
-    await queryInterface.dropTable('TaskLists');
+    await queryInterface.removeConstraint('TaskList', 'unique_user_tasklist_name');
+    await queryInterface.dropTable('TaskList');
   }
 };

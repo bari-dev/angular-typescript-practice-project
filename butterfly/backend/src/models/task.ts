@@ -1,5 +1,8 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/database';
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../config/database";
+import TaskList from "./tasklist";
+import User from "./user";
+import TaskUser from "./taskuser";
 
 class Task extends Model {
   public id!: number;
@@ -13,9 +16,19 @@ class Task extends Model {
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  static associate(models: any) {
-    Task.belongsTo(models.TaskList, { foreignKey: 'taskListId', as: 'taskList' });
-    Task.belongsTo(models.User, { foreignKey: 'assignedToUserId', as: 'assignedToUser' });
+  static associate() {
+    Task.belongsTo(TaskList, {
+      foreignKey: "taskListId",
+      as: "taskList",
+    });
+
+    Task.belongsTo(User, { foreignKey: 'creatorId', as: 'creator' });
+
+    Task.belongsToMany(User, {
+      through: TaskUser,
+      foreignKey: "taskId",
+      as: "users"
+    });
   }
 }
 
@@ -27,56 +40,30 @@ Task.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-    },
-    completed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    deadline: {
-      type: DataTypes.DATE,
-    },
-    slug: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
+    title: { type: DataTypes.STRING, allowNull: false },
+    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+    description: { type: DataTypes.STRING },
+    completed: { type: DataTypes.BOOLEAN, defaultValue: false },
+    deadline: { type: DataTypes.DATE },
     taskListId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'TaskLists',
-        key: 'id',
-      },
-      onDelete: 'CASCADE',
+      references: { model: "TaskList", key: "id" },
+      onDelete: "CASCADE",
     },
-    assignedToUserId: {
+    creatorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
-      onDelete: 'CASCADE',
+      references: { model: "User", key: "id" },
+      onDelete: "CASCADE",
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    createdAt: { type: DataTypes.DATE, allowNull: false },
+    updatedAt: { type: DataTypes.DATE, allowNull: false },
   },
   {
     sequelize,
-    tableName: 'Tasks',
-    modelName: 'Task',
+    tableName: "Task", 
+    modelName: "Task",
   }
 );
 
