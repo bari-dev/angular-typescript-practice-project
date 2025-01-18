@@ -1,12 +1,48 @@
-import { Request, Response } from 'express';
-import TaskService from '../services/task.service';
+import { Request, Response } from "express";
+import TaskService from "../services/task.service";
 
 class TaskController {
   // Create Task
   async createTask(req: Request, res: Response): Promise<void> {
-    const { title, description, taskListId, assignedToUserId, deadline } = req.body;
+    const { title, description, tasklistSlug, assignedToUserId, deadline, completed } = req.body.input;
+
     try {
-      const task = await TaskService.createTask(title, description, taskListId, assignedToUserId, deadline);
+      if(tasklistSlug !== req.tasklist?.slug) throw new Error('Invalid request.')
+      // Ensure the task title is unique, if applicable
+
+      let taskSlug = title
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
+      // Check if a task with the same slug already exists in the task list (optional)
+      let existingTask = await TaskService.findTaskBySlugAndTaskList(
+        taskSlug,
+        req.tasklist?.id
+      );
+
+      // If a task with the same slug exists, append a random suffix to make it unique
+      while (existingTask) {
+        const randomSuffix = Math.floor(10000 + Math.random() * 99999);
+        taskSlug = `${taskSlug}-${randomSuffix}`;
+        existingTask = await TaskService.findTaskBySlugAndTaskList(
+          taskSlug,
+          req.tasklist?.id
+        );
+      }
+
+      // Create the task using the provided details
+      const task = await TaskService.createTask(
+        title,
+        description,
+        req.tasklist?.id,
+        deadline,
+        completed,
+        taskSlug,
+        req?.user?.id
+      );
+
+      // Return the created task as a response
       res.status(201).json(task);
       return;
     } catch (err) {
@@ -17,7 +53,7 @@ class TaskController {
 
   // Get all Tasks in a Task List
   async getAllTasks(req: Request, res: Response): Promise<void> {
-    const tasklist = req.tasklist 
+    const tasklist = req.tasklist;
     try {
       const tasks = await TaskService.getAllTasks(Number(tasklist?.id));
       res.status(200).json(tasks);
@@ -46,7 +82,13 @@ class TaskController {
     const { taskId } = req.params;
     const { title, description, completed, deadline } = req.body;
     try {
-      const updatedTask = await TaskService.updateTask(Number(taskId), title, description, completed, deadline);
+      const updatedTask = await TaskService.updateTask(
+        Number(taskId),
+        title,
+        description,
+        completed,
+        deadline
+      );
       res.status(200).json(updatedTask);
       return;
     } catch (err) {
@@ -75,7 +117,7 @@ class TaskController {
     try {
       const updatedTask = await TaskService.toggleTaskStatus(Number(taskId));
       if (!updatedTask) {
-        res.status(404).json({ message: 'Task not found' });
+        res.status(404).json({ message: "Task not found" });
         return;
       }
 

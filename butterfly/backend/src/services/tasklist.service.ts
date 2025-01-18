@@ -5,9 +5,9 @@ import { TasklistWithUserInterface } from 'interfaces/tasklistWithUser';
 import { UniqueConstraintError } from 'sequelize';
 
 class TaskListService {
-  async createTaskList(name: string, userId: number, slug: string) {
+  async createTaskList(name: string, creatorId: number, slug: string) {
     try {
-      const taskList = await TaskList.create({ name, userId, slug });
+      const taskList = await TaskList.create({ name, creatorId, slug });
       return taskList;
     } catch (error) {
       if(error instanceof UniqueConstraintError){
@@ -20,11 +20,14 @@ class TaskListService {
 
   async getAllTaskLists(userId: number) {
     try {
-      const taskLists = await TaskList.findAll({ where: { userId }, order: [['createdAt', 'DESC']], include: [{
-        model: User,
-        as: 'creator',
-        attributes: ['id', 'firstName', 'lastName']
-      }] });
+      const taskLists = await TaskList.findAll({
+        where: { creatorId: userId },
+        include: [{
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'firstName', 'lastName']
+        }]
+      });
       return taskLists;
     } catch (error) {
       throw new Error('Error fetching task lists: ' + error);

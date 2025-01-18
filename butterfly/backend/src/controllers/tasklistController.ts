@@ -4,7 +4,7 @@ import TaskListService from '../services/tasklist.service';
 class TaskListController {
   async createTaskList(req: Request, res: Response): Promise<void> {
     const name = req.body.name;
-    const userId = req.user?.id;
+    const creatorId = req.user?.id;
   
     try {
       let slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
@@ -18,7 +18,7 @@ class TaskListController {
         existingTaskList = await TaskListService.findTaskListBySlug(slug);
       }
     
-      const taskList = await TaskListService.createTaskList(name, Number(userId), slug);
+      const taskList = await TaskListService.createTaskList(name, Number(creatorId), slug);
   
       res.status(201).json(taskList);
       return;

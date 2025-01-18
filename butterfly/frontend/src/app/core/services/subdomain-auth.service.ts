@@ -42,9 +42,7 @@ export class SubdomainAuthService {
   }
 
   logout(){
-    localStorage.removeItem(`${this.tasklistSlug}_user`);
-    localStorage.removeItem(`${this.tasklistSlug}_token`);
-    localStorage.removeItem(`${this.tasklistSlug}_tasklist`);
+    localStorage.removeItem(`${this.tasklistSlug}`);
     this.isLoggedIn = false;
   }
 

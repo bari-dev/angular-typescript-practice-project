@@ -15,6 +15,7 @@ import { TaskService } from './task.service';
 import { TaskInterface } from '../../core/interfaces/models/task.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTaskComponent } from './add-task/add-task.component';
+import { CountdownComponent } from '../../shared/countdown/countdown.component';
 
 @Component({
   selector: 'app-tasks',
@@ -29,7 +30,8 @@ import { AddTaskComponent } from './add-task/add-task.component';
     CommonModule,
     MatIconModule,
     TaskDetailsComponent,
-    AddTaskComponent
+    AddTaskComponent,
+    CountdownComponent
   ]
 })
 export class TasksComponent implements AfterViewInit, OnInit {
@@ -47,7 +49,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
   total: number = 0;
   searchResults: TaskInterface[] = [];
   loading: boolean = false;
-  displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
+  displayedColumns: string[] = ['sn', 'title', 'due-date', 'status', 'actions'];
   dataSource = new MatTableDataSource<TaskInterface>;
   taskListSlug: string = '';
 
@@ -117,22 +119,24 @@ export class TasksComponent implements AfterViewInit, OnInit {
   onSearchQueryChange() {
     this.fetchTasks();
   }
-  
+
   onLogout(): void {
     this._subdomainAuthService.logout();
     this.router.navigateByUrl('/');
   }
 
-  openAddTaskModal(): void {
+  openAddTaskModal(task?: TaskInterface): void {
     const dialogRef = this.dialog.open(AddTaskComponent, {
       width: '400px',
-      data: {} // Optional: Pass data to the modal
+      data: task ? { taskToEdit: task } : {}
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Task Created:', result);
-      }
+  
+    dialogRef.componentInstance.taskCreated.subscribe(() => {
+      this.fetchTasks();
+    });
+  
+    dialogRef.componentInstance.taskUpdated.subscribe(() => {
+      this.fetchTasks();
     });
   }
 }

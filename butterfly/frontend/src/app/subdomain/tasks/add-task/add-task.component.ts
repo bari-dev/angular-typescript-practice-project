@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { TaskService } from '../task.service';
 import { SubdomainAuthService } from '../../../core/services/subdomain-auth.service';
+import { TaskService } from '../task.service';
 
 @Component({
-  selector: 'app-create-task',
+  selector: 'app-add-task',
   templateUrl: './add-task.component.html',
   styleUrls: ['./add-task.component.css'],
   standalone: true,
@@ -21,21 +21,35 @@ import { SubdomainAuthService } from '../../../core/services/subdomain-auth.serv
   ]
 })
 export class AddTaskComponent implements OnInit {
+  @Input() taskToEdit: any | null = null;
+  @Output() taskCreated = new EventEmitter<void>();
+  @Output() taskUpdated = new EventEmitter<void>();
+
   taskTitle: string = '';
   taskDescription: string = '';
   taskCompleted: boolean = false;
   taskDeadline: string = '';
   errorMessage: string = '';
   isSubmitting: boolean = false;
-
   currentDate: string;
 
-  constructor(private _subdomainAuthService: SubdomainAuthService,private dialog: MatDialog, private taskService: TaskService) {
+  constructor(
+    private _subdomainAuthService: SubdomainAuthService,
+    private dialog: MatDialog,
+    private taskService: TaskService
+  ) {
     const now = new Date();
     this.currentDate = now.toISOString().slice(0, 16);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.taskToEdit) {
+      this.taskTitle = this.taskToEdit.title;
+      this.taskDescription = this.taskToEdit.description;
+      this.taskCompleted = this.taskToEdit.completed;
+      this.taskDeadline = this.taskToEdit.deadline;
+    }
+  }
 
   async onSubmit(): Promise<void> {
     if (this.isSubmitting) return;
@@ -62,17 +76,21 @@ export class AddTaskComponent implements OnInit {
       deadline: this.taskDeadline,
       creatorId: this._subdomainAuthService.getUser(),
       tasklistSlug: this._subdomainAuthService.getTasklist().slug
-    }
+    };
 
     try {
-      const createdTask = await this.taskService.createTask(newTask);
+      if (this.taskToEdit) {
+        // await this.taskService.updateTask(this.taskToEdit.id, newTask);
+        this.taskUpdated.emit();
+      } else {
+        await this.taskService.createTask(newTask);
+        this.taskCreated.emit();
+      }
 
       this.dialog.closeAll();
       this.resetFields();
-      console.log('Task created successfully:', createdTask);
-
     } catch (error) {
-      this.errorMessage = 'Error creating task. Please try again later.';
+      this.errorMessage = 'Error processing task. Please try again later.';
     } finally {
       this.isSubmitting = false;
     }
