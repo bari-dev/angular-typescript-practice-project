@@ -3,6 +3,7 @@ import sequelize from "../config/database";
 import TaskList from "./tasklist";
 import Task from "./task";
 import TaskUser from "./taskuser";
+import TasklistMember from "./tasklistMembers";
 
 class User extends Model {
   public id!: number;
@@ -14,15 +15,23 @@ class User extends Model {
   public readonly updatedAt!: Date;
 
   static associate() {
-    // User has many TaskLists (one-to-many)
     User.hasMany(TaskList, { foreignKey: "creatorId", as: "tasklists" });
-
-    // User has many Tasks through TaskUser (many-to-many)
     User.belongsToMany(Task, {
       through: TaskUser,
-      foreignKey: "creatorId",
+      foreignKey: "userId",
       as: "tasks",
     });
+
+    User.belongsToMany(TaskList, {
+      through: TasklistMember,
+      foreignKey: "memberId",
+      as: "userTasklists",
+    });
+
+    User.hasMany(TasklistMember, {
+      foreignKey: "memberId",
+      as: "tasklistMembers"
+    })
   }
 }
 

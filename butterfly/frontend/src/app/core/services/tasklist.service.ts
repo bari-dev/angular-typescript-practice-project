@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service'; 
 import { env } from 'src/environments/environment';
+import TasklistInterface from '../interfaces/models/tasklist.interface';
 
 const BASE_URL = `${env.apiBaseUrl}/tasklists`;
 
@@ -26,9 +27,9 @@ export class TasklistService {
     return headers;
   }
 
-  getTasklists(): Observable<any[]> {
+  getTasklists(page: number = 1, pageSize: number = 5): Observable<any[]> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any[]>(this.apiUrl, { headers });
+    return this.http.get<any[]>(`${this.apiUrl}?page=${page}&pageSize=${pageSize}`, { headers });
   }
 
   createTasklist(newTasklist: any): Observable<any> {
@@ -48,6 +49,6 @@ export class TasklistService {
 
   getTasklistById(id: string): Observable<any> {
     const headers = this.getAuthHeaders();  
-    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.get<TasklistInterface>(`${this.apiUrl}/${id}`, { headers });
   }
 }

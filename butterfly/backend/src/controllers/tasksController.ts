@@ -2,26 +2,18 @@ import { Request, Response } from "express";
 import TaskService from "../services/task.service";
 
 class TaskController {
-  // Create Task
   async createTask(req: Request, res: Response): Promise<void> {
-    const { title, description, tasklistSlug, assignedToUserId, deadline, completed } = req.body.input;
-
+    const { title, description, tasklistSlug, deadline, completed } = req.body.input;
     try {
       if(tasklistSlug !== req.tasklist?.slug) throw new Error('Invalid request.')
-      // Ensure the task title is unique, if applicable
-
       let taskSlug = title
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^\w-]+/g, "");
-
-      // Check if a task with the same slug already exists in the task list (optional)
       let existingTask = await TaskService.findTaskBySlugAndTaskList(
         taskSlug,
         req.tasklist?.id
       );
-
-      // If a task with the same slug exists, append a random suffix to make it unique
       while (existingTask) {
         const randomSuffix = Math.floor(10000 + Math.random() * 99999);
         taskSlug = `${taskSlug}-${randomSuffix}`;
@@ -30,8 +22,6 @@ class TaskController {
           req.tasklist?.id
         );
       }
-
-      // Create the task using the provided details
       const task = await TaskService.createTask(
         title,
         description,
@@ -41,8 +31,6 @@ class TaskController {
         taskSlug,
         req?.user?.id
       );
-
-      // Return the created task as a response
       res.status(201).json(task);
       return;
     } catch (err) {
@@ -51,20 +39,26 @@ class TaskController {
     }
   }
 
-  // Get all Tasks in a Task List
   async getAllTasks(req: Request, res: Response): Promise<void> {
     const tasklist = req.tasklist;
+  
     try {
       const tasks = await TaskService.getAllTasks(Number(tasklist?.id));
+      
+      if (tasks.length === 0) {
+        res.status(200).json({ message: 'No tasks found for the current user in this tasklist.' });
+        return;
+      }
+  
       res.status(200).json(tasks);
       return;
     } catch (err) {
-      res.status(500).json({ message: String(err) });
+      console.error('Error fetching tasks:', err);
+      res.status(500).json({ message: 'An error occurred while fetching tasks.' });
       return;
     }
   }
 
-  // Get Task by ID
   async getTaskById(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
     try {
@@ -77,7 +71,6 @@ class TaskController {
     }
   }
 
-  // Update Task
   async updateTask(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
     const { title, description, completed, deadline } = req.body;
@@ -97,7 +90,6 @@ class TaskController {
     }
   }
 
-  // Delete Task
   async deleteTask(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
     try {
@@ -110,7 +102,6 @@ class TaskController {
     }
   }
 
-  // Toggle Task Status
   async updateStatus(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
 

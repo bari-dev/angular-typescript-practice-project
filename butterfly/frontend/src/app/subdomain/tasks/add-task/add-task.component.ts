@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SubdomainAuthService } from '../../../core/services/subdomain-auth.service';
 import { TaskService } from '../task.service';
+import { TaskInterface } from '../../../core/interfaces/models/task.interface';
 
 @Component({
   selector: 'app-add-task',
@@ -21,10 +22,10 @@ import { TaskService } from '../task.service';
   ]
 })
 export class AddTaskComponent implements OnInit {
-  @Input() taskToEdit: any | null = null;
   @Output() taskCreated = new EventEmitter<void>();
   @Output() taskUpdated = new EventEmitter<void>();
 
+  task?: TaskInterface;
   taskTitle: string = '';
   taskDescription: string = '';
   taskCompleted: boolean = false;
@@ -32,22 +33,29 @@ export class AddTaskComponent implements OnInit {
   errorMessage: string = '';
   isSubmitting: boolean = false;
   currentDate: string;
+  tasklistSlug?: string;
 
   constructor(
     private _subdomainAuthService: SubdomainAuthService,
     private dialog: MatDialog,
-    private taskService: TaskService
+    private taskService: TaskService,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private _matDialogRef: MatDialogRef<AddTaskComponent>,
   ) {
+    if(data){
+      this.task = data.taskToEdit;
+      this.tasklistSlug = data.tasklistSlug;
+    }
     const now = new Date();
     this.currentDate = now.toISOString().slice(0, 16);
   }
 
   ngOnInit(): void {
-    if (this.taskToEdit) {
-      this.taskTitle = this.taskToEdit.title;
-      this.taskDescription = this.taskToEdit.description;
-      this.taskCompleted = this.taskToEdit.completed;
-      this.taskDeadline = this.taskToEdit.deadline;
+    if (this.task) {
+      this.taskTitle = this.task.title;
+      this.taskDescription = this.task.description;
+      this.taskCompleted = this.task.completed;
+      this.taskDeadline = this.task.deadline.slice(0, 16);      
     }
   }
 
@@ -69,25 +77,23 @@ export class AddTaskComponent implements OnInit {
       return;
     }
 
-    const newTask = {
+    const newTask: any = {
       title: this.taskTitle,
       description: this.taskDescription,
       completed: this.taskCompleted,
       deadline: this.taskDeadline,
-      creatorId: this._subdomainAuthService.getUser(),
+      creatorId: this._subdomainAuthService.getUser()?.id,
       tasklistSlug: this._subdomainAuthService.getTasklist().slug
     };
 
     try {
-      if (this.taskToEdit) {
-        // await this.taskService.updateTask(this.taskToEdit.id, newTask);
-        this.taskUpdated.emit();
+      if (this.task) {
+        await this.taskService.updateTask(newTask, this.task.id);
       } else {
-        await this.taskService.createTask(newTask);
-        this.taskCreated.emit();
+        this.task = await this.taskService.createTask(newTask);
       }
 
-      this.dialog.closeAll();
+      this.closeSubmitDialog()
       this.resetFields();
     } catch (error) {
       this.errorMessage = 'Error processing task. Please try again later.';
@@ -97,7 +103,11 @@ export class AddTaskComponent implements OnInit {
   }
 
   closeDialog(): void {
-    this.dialog.closeAll();
+    this._matDialogRef.close();
+  }
+
+  closeSubmitDialog(): void {
+    this._matDialogRef.close(this.task);
   }
 
   resetFields(): void {

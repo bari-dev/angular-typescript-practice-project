@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { CountdownComponent } from '../../../shared/countdown/countdown.component';
+import { SubdomainAuthService } from '../../../core/services/subdomain-auth.service';
+import { TaskService } from '../task.service';
+import { AddUsersComponent } from '../add-users/add-users.component';
+import { TasklistService } from '../../../core/services/tasklist.service';
 
 @Component({
   selector: 'app-task-details',
@@ -8,29 +13,55 @@ import { Component, Input, OnChanges, Output, SimpleChanges } from '@angular/cor
   standalone: true,
   imports: [
     CommonModule,
-    TaskDetailsComponent
+    TaskDetailsComponent,
+    CountdownComponent,
+    AddUsersComponent
   ]
 })
 export class TaskDetailsComponent implements OnChanges {
+  tasklist: any = null;
   @Input() task: any = null;
-  @Output() isModalOpen = false;
+  @Output() isModalOpen = new EventEmitter<boolean>(false);
+  @Output() closeModal = new EventEmitter<void>();
 
+  contributors: any[] = [];
+
+  constructor(private _subdomainAuthService: SubdomainAuthService, private taskService: TaskService, private _tasklist: TasklistService){
+  }
+  
   ngOnChanges(changes: SimpleChanges) {
     if (changes['task'] && this.task) {
-      this.isModalOpen = true;
+      this.tasklist = this.fetchTasklist();
+      this.isModalOpen.emit(true);
+      // this.contributors = this.task.contributors || [];
     }
   }
 
+  fetchTasklist = () => this._tasklist.getTasklistById(this._subdomainAuthService.getTasklist().id);
+
   closePanel() {
-    this.isModalOpen = false;
-    this.task   = null;
+    this.isModalOpen.emit(false);
+    this.task = null;
+    this.contributors = [];
+    this.closeModal.emit();
   }
 
-  markComplete(){
-
+  markComplete() {
+    if (this.task) {
+      this.task.completed = 1;
+    }
   }
 
-  editTask(){
-    
+  editTask() {
+  }
+
+  addContributor(user: any) {
+    if (user && !this.contributors.find(contrib => contrib.id === user.id)) {
+      this.contributors.push(user);
+    }
+  }
+
+  removeContributor(user: any) {
+    this.contributors = this.contributors.filter(contrib => contrib.id !== user.id);
   }
 }

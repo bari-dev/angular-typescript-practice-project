@@ -34,16 +34,16 @@ export class ButterflyClientApi {
   async createTask(params: { input: TaskInterface }): Promise<{ task: TaskInterface }> {
     try {
       const response = await this.axiosInstance.post(`/tasklists/${this._subdomainAuthService.getTasklist().slug}/tasks`, params);
-      return { task: response.data.task };
+      return { task: response.data };
     } catch (error) {
       console.log("Error creating task:", error);
       throw error;
     }
   }
 
-  async editTasksById(params: { task: TaskInterface; deletedNumberIds: number[] }): Promise<{ task: TaskInterface }> {
+  async editTasksById(params: { task: TaskInterface; tasklistId: number}): Promise<{ task: TaskInterface }> {
     try {
-      const response = await this.axiosInstance.put(`/tasks/${params.task.id}`, params);
+      const response = await this.axiosInstance.put(`tasklist/${params.tasklistId}/tasks/${params.task.id}`, params);
       return { task: response.data.task };
     } catch (error) {
       console.log("Error editing task:", error);

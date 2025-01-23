@@ -12,6 +12,7 @@ import User from './models/user';
 import sequelizeConnection from './config/database';
 import subdomainAuth from './middleware/subdomainAuthTasklist';
 import Task from './models/task';
+import TasklistMember from './models/tasklistMembers';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ sequelizeConnection.authenticate().then(() => {
   TaskList.associate();
   User.associate();
   Task.associate();
+  TasklistMember.associate();
 });
 
 // basic api path

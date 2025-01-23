@@ -1,9 +1,76 @@
-<div *ngIf="task" class="bg-[#424242] text-white shadow-lg p-4 transition-all duration-300 relative w-full">
-    <h2 class="text-xl font-bold mb-4">Task Details</h2>
-    <div>
-        <p><strong>Title:</strong> {{ task.title }}</p>
-        <p><strong>Status:</strong> {{ task.status }}</p>
-        <p><strong>Description:</strong> {{ task.description || 'No description provided.' }}</p>
-    </div>
-    <button (click)="closePanel()" class="absolute top-4 right-4 text-lg text-white">&times;</button>
+<div
+  *ngIf="task"
+  class="bg-[#424242] text-white shadow-lg p-4 transition-all duration-300 relative w-full"
+>
+  <h2 class="text-xl font-bold mb-4">Task Details</h2>
+  <div>
+    <p><strong>Title:</strong> {{ task.title }}</p>
+    <p>
+      <strong>Status:</strong>
+
+      <span
+        *ngIf="task.completed; else incompleted"
+        class="bg-green-700 text-green-100 py-2 px-4 mx-4 rounded-full text-xs font-bolder"
+      >
+        Completed
+      </span>
+
+      <ng-template #incompleted>
+        <span
+          class="bg-red-600 text-red-100 py-2 px-4 rounded-full text-xs font-bolder mx-4"
+        >
+          Pending
+        </span>
+      </ng-template>
+    </p>
+    <p>
+      <strong>Description:</strong>
+      {{ task.description || "No description provided." }}
+    </p>
+    <p class="flex margin--bottom--0">
+      <strong>Due Date:</strong>
+      <span class="ml-2 mr-4 margin--bottom--0">
+        <app-countdown [targetDate]="task.deadline"></app-countdown>
+      </span>
+    </p>
+    <p>
+      <strong>Creator:</strong>
+      {{ task.creator.firstName + " " + task.creator.lastName }}
+    </p>
+    <p><strong>Created At:</strong> {{ task.createdAt | date : "short" }}</p>
+  </div>
+
+  <div class="my-4">
+    <h3 class="font-semibold margin--bottom--0">Contributors:</h3>
+    <ul>
+      <li *ngFor="let contributor of contributors">
+        {{ contributor.name }}
+        <button
+          (click)="removeContributor(contributor)"
+          class="text-red-500 ml-2"
+        >
+          Remove
+        </button>
+      </li>
+    </ul>
+    <app-add-users [tasklist]="tasklist" task="task"></app-add-users>
+  </div>
+
+  <div class="mt-4">
+    <button
+      (click)="markComplete()"
+      class="bg-green-500 text-white py-1 px-4 rounded"
+      [disabled]="task.completed"
+      [ngClass]="{ 'bg-gray-400': task.completed }"
+    >
+      Mark as Complete
+    </button>
+  </div>
+
+  <button
+    (click)="closePanel()"
+    class="absolute top-4 right-4 text-lg text-white"
+  >
+    &times;
+  </button>
 </div>

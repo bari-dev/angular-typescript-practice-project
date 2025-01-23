@@ -20,8 +20,8 @@ export class TaskService {
     return (await this._clientApi.createTask({ input })).task;
   }
 
-  async editTask(task: TaskInterface, deletedNumberIds: number[]): Promise<TaskInterface> {
-    return (await this._clientApi.editTasksById({ task, deletedNumberIds })).task;
+  async updateTask(task: TaskInterface, tasklistId: number): Promise<TaskInterface> {
+    return (await this._clientApi.editTasksById({ task, tasklistId })).task;
   }
 
   async getTaskBySearchFilter(input: string): Promise<TaskInterface[]> {

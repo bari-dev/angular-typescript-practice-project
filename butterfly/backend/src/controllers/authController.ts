@@ -59,6 +59,10 @@ const registerSchema = Joi.object({
 
 export const registerController: any = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     const { firstName, lastName, email, password } = req.body;
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {

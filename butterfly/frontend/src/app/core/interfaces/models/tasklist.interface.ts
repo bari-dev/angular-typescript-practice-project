@@ -10,7 +10,10 @@ interface TasklistInterface {
   name: string;
   creator: TasklistUser;
   slug: string;
+  completed: boolean;
+  dueDate: Date;
   tasks?: TaskInterface[];
+  tasklistMembers: TasklistUser[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -4,7 +4,10 @@
       {{ tasklist.name.toUpperCase() }}
     </div>
     <span>
-      <button (click)="openAddTaskModal()"
+      <app-contributors [tasklist]="tasklist"></app-contributors>
+      <app-add-member [tasklist]="tasklist"></app-add-member>
+      <button 
+        (click)="openAddTaskModal()"
         class="hover:bg-red-500 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mr-3">
         Add New Task
       </button>
@@ -28,11 +31,9 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
           title
         </th>
-        <td mat-cell *matCellDef="let element" class="cursor-pointer hover:bg-blue-500">
-          <span (click)="onTaskClick(element)">
-            <span mat-button>
-              {{ element.title }}
-            </span>
+        <td mat-cell *matCellDef="let element" class="cursor-pointer hover:bg-blue-500" (click)="onTaskClick(element)">
+          <span mat-button>
+            {{ element.title }}
           </span>
         </td>
       </ng-container>
@@ -53,9 +54,9 @@
           Status
         </th>
         <td mat-cell *matCellDef="let element">
-          <mat-icon *ngIf="element.completed; else notCompleted">check</mat-icon>
+          <mat-icon *ngIf="element.completed; else notCompleted" class="text-green-500">check</mat-icon>
           <ng-template #notCompleted>
-            <mat-icon>close</mat-icon>
+            <mat-icon class="text-red-500 border-1 border-red-500">close</mat-icon>
           </ng-template>
         </td>
       </ng-container>
@@ -73,15 +74,8 @@
                 </button>
               </li>
               <li class="slds-dropdown__item flex cursor-pointer">
-                <!-- <a
-                    role="menuitem"
-                    nglDropdownItem
-                    (click)="deleteTask(task, ind)"
-                    (click)="task.openMenu = false"
-                  > -->
                 <p class="slds-truncate"></p>
                 <mat-icon class="mat-icon-size-24" color="warn">delete</mat-icon>
-                <!-- </a> -->
               </li>
             </ul>
           </div>
@@ -92,8 +86,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <mat-paginator class='w-full' [length]="tasks.length" [pageSize]="5" [pageSizeOptions]="[5]"
-      aria-label="Select page"></mat-paginator>
+    <mat-paginator class='w-full' [length]="tasks.length" [pageSize]="5" [pageSizeOptions]="[5]" aria-label="Select page"></mat-paginator>
   </span>
 
   <div *ngIf="isModalOpen" class="flex-2 w-[60%] h-[60%] border-2 border-[#212121] rounded-[20px]">

@@ -40,8 +40,7 @@ export class TasklistNewComponent {
           this.isSubmitting = false; 
         },
         (error) => {
-          console.error('Error creating tasklist:', error); 
-          this.errorMessage = 'An error occurred while creating the task list.';
+          this.errorMessage = error.error.message;
           this.isSubmitting = false;
         }
       );

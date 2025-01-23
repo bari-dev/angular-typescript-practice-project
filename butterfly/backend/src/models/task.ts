@@ -17,10 +17,7 @@ class Task extends Model {
   public readonly updatedAt!: Date;
 
   static associate() {
-    Task.belongsTo(TaskList, {
-      foreignKey: "taskListId",
-      as: "taskList",
-    });
+    Task.belongsTo(TaskList, { foreignKey: 'tasklistId', as: 'tasklist' });
 
     Task.belongsTo(User, { foreignKey: 'creatorId', as: 'creator' });
 

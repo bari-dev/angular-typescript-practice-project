@@ -1,11 +1,11 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, NgModel } from '@angular/forms';
+import { AfterViewInit, Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { TaskDetailsComponent } from './task-details/task-details.component';
 import { SubdomainAuthService } from '../../core/services/subdomain-auth.service';
@@ -16,6 +16,9 @@ import { TaskInterface } from '../../core/interfaces/models/task.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { CountdownComponent } from '../../shared/countdown/countdown.component';
+import { AddUsersComponent } from './add-users/add-users.component';
+import { ContributorsComponent } from './contributors/contributors.component';
+import { AddMemberComponent } from './add-member/add-member.component';
 
 @Component({
   selector: 'app-tasks',
@@ -31,8 +34,11 @@ import { CountdownComponent } from '../../shared/countdown/countdown.component';
     MatIconModule,
     TaskDetailsComponent,
     AddTaskComponent,
-    CountdownComponent
-  ]
+    CountdownComponent,
+    AddUsersComponent,
+    ContributorsComponent,
+    AddMemberComponent
+  ],
 })
 export class TasksComponent implements AfterViewInit, OnInit {
   tasks: TaskInterface[] = [];
@@ -50,7 +56,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
   searchResults: TaskInterface[] = [];
   loading: boolean = false;
   displayedColumns: string[] = ['sn', 'title', 'due-date', 'status', 'actions'];
-  dataSource = new MatTableDataSource<TaskInterface>;
+  dataSource = new MatTableDataSource<TaskInterface>();
   taskListSlug: string = '';
 
   @ViewChild(MatSort) sort: MatSort | null = null;
@@ -68,7 +74,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
     this.tasklist = this._subdomainAuthService.getTasklist();
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
     this.fetchTasks();
   }
 
@@ -92,7 +98,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
 
   getLinkForName(task: TaskDetailsInterface) {}
 
-  onTaskClick(task: any) {
+  onTaskClick(task: any, ) {
     this.selectedTaskDetails = task;
     this.isModalOpen = true;
   }
@@ -106,7 +112,6 @@ export class TasksComponent implements AfterViewInit, OnInit {
     try {
       const tasks = await this._taskService.getTasks(this.tasklist.slug);
       this.tasks = tasks;
-      console.log(tasks);
       this.dataSource = new MatTableDataSource(tasks);
     } catch (error) {
       this.showAlert = true;
@@ -126,17 +131,24 @@ export class TasksComponent implements AfterViewInit, OnInit {
   }
 
   openAddTaskModal(task?: TaskInterface): void {
-    const dialogRef = this.dialog.open(AddTaskComponent, {
-      width: '400px',
-      data: task ? { taskToEdit: task } : {}
-    });
-  
-    dialogRef.componentInstance.taskCreated.subscribe(() => {
-      this.fetchTasks();
-    });
-  
-    dialogRef.componentInstance.taskUpdated.subscribe(() => {
-      this.fetchTasks();
-    });
+    this.dialog.closeAll();
+    const dialogRef = this.dialog
+      .open(AddTaskComponent, {
+        width: '500px',
+        data: task
+          ? { tasklist: this.tasklist, taskToEdit: task, tasklistSlug: this.tasklist.slug }
+          : { tasklist: this.tasklist },
+      })
+      .afterClosed()
+      .subscribe((data) => {
+        if (data) {
+          if (task) {
+            this.tasks.findIndex((stask) => stask.id === task.id);
+          } else {
+            this.tasks.unshift(data);
+            this.dataSource.filter = '';
+          }
+        }
+      });
   }
 }

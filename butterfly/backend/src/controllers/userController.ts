@@ -16,7 +16,13 @@ export const getCurrentUserProfile: any = async(req: Request, res: Response) => 
   try {
     const reqUser = req.user
     const user    = User.findByPk(reqUser?.id)
-    res.json(user)
+    const dashboard = {
+      "totalTasklist": 0,
+      "lastLogin": new Date,
+      "totalTask": 0,
+      "totalContributor": 0
+    }
+    res.json({user, dashboard})
   }catch (err){
     throw err
   }

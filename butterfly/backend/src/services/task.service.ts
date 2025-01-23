@@ -1,4 +1,5 @@
 import Task from "../models/task";
+import User from "../models/user";
 
 class TaskService {
   // Create a new Task
@@ -27,10 +28,18 @@ class TaskService {
     }
   }
 
-  // Get all tasks for a task list
   async getAllTasks(taskListId: number) {
     try {
-      const tasks = await Task.findAll({ where: { taskListId }, order: [['createdAt', 'desc']] });
+      const tasks = await Task.findAll({ where: { taskListId }, order: [['createdAt', 'desc']], include: [
+        {
+          model: User,
+          as: 'creator'
+        },
+        {
+          model: User,
+          as: 'users'
+        }
+      ] });
       return tasks;
     } catch (error) {
       throw new Error("Error fetching tasks: " + error);

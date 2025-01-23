@@ -8,44 +8,63 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 })
 export class CountdownComponent implements OnInit, OnDestroy {
   @Input() targetDate!: string | Date;
-
+  currentDate: Date = new Date();
   countdown: string = 'Loading...';
   private interval: any;
 
   ngOnInit(): void {
-    this.startCountdown();
+    this.countDown();
   }
 
   ngOnDestroy(): void {
     if (this.interval) {
-      clearInterval(this.interval); // Clean up interval when component is destroyed
+      clearInterval(this.interval);
     }
   }
 
-  startCountdown(): void {
-    // Ensure the targetDate is converted to a Date object if it's a string
-    const dueDate = new Date(this.targetDate).getTime();
-    if (isNaN(dueDate)) {
+  countDown(): void {
+    const targetDateTime = new Date(this.targetDate).getTime();
+    const currentDateTime = this.currentDate.getTime();
+
+    if (isNaN(targetDateTime)) {
       this.countdown = 'Invalid target date.';
       return;
     }
 
+    if (targetDateTime > currentDateTime) {
+      this.startCountdown();
+    } else {
+      this.pastDue();
+    }
+  }
+
+  startCountdown(): void {
     this.interval = setInterval(() => {
       const now = new Date().getTime();
-      const timeLeft = dueDate - now;
+      const targetDateTime = new Date(this.targetDate).getTime();
+      const timeLeft = targetDateTime - now;
 
-      if (timeLeft <= 0) {
-        this.countdown = `The due date has passed!`;
-        clearInterval(this.interval);
-        return;
-      }
+      const days    = Math.floor(timeLeft / (86400000));
+      const hours   = Math.floor((timeLeft % (86400000)) / (3600000));
+      const minutes = Math.floor((timeLeft % (3600000)) / (60000));
+      const seconds = Math.floor((timeLeft % (60000)) / 1000);
 
-      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      this.countdown = `${days} days ${(hours * 60) + minutes} minutes ${seconds} seconds until due`;
+    }, 1000);
+  }
 
-      this.countdown = `${days} days ${minutes} minutes ${seconds} seconds`;
+  pastDue(): void {
+    this.interval = setInterval(() => {
+      const now = new Date().getTime();
+      const targetDateTime = new Date(this.targetDate).getTime();
+      const timeLeft = now - targetDateTime;
+
+      const days    = Math.floor(timeLeft / (86400000));
+      const hours   = Math.floor((timeLeft % (86400000)) / (3600000));
+      const minutes = Math.floor((timeLeft % (3600000)) / (60000));
+      const seconds = Math.floor((timeLeft % (60000)) / 1000);
+
+      this.countdown = `${days} days ${(hours * 60) + minutes} minutes ${seconds} seconds past due`;
     }, 1000);
   }
 }
