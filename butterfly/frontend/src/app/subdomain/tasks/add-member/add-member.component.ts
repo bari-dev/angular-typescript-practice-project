@@ -89,7 +89,7 @@ export class AddMemberComponent implements OnChanges {
   }
 
   private emitTaskUpdate(): void {
-    const updatedTask = { ...this.tasklist, contributors: this.contributors };
+    const updatedTask = { ...this.tasklist, users: this.contributors };
     this.updateTask.emit(updatedTask);
   }
 

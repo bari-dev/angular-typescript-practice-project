@@ -1,8 +1,7 @@
 <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="p-6 rounded-lg w-96 bg-[#212121]">
-    <h3 class="text-lg font-semibold mb-4 text-white font-bolder">Add a Contributor</h3>
+    <h3 class="text-lg font-semibold mb-4 text-white font-bolder">Add a Member</h3>
     
-    <!-- Input field to add a member via email -->
     <input 
       [(ngModel)]="newUserEmail" 
       type="email"
@@ -29,7 +28,6 @@
   </div>
 </div>
 
-<!-- Button to open the modal -->
 <button 
   (click)="openModal()" 
   class="hover:bg-red-500 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mr-3">

@@ -53,9 +53,6 @@ export class TaskDetailsComponent implements OnChanges {
     }
   }
 
-  editTask() {
-  }
-
   addContributor(user: any) {
     if (user && !this.contributors.find(contrib => contrib.id === user.id)) {
       this.contributors.push(user);

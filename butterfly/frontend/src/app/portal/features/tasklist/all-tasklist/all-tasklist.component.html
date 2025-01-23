@@ -3,16 +3,26 @@
     <h1 class="text-left text-3xl font-bold">TaskLists</h1>
 
     <div class="flex justify-between items-center mb-5">
-      <button mat-raised-button class='btn btn-primary' routerLink="/tasklists/new">Create New Tasklist</button>
+      <button
+        mat-raised-button
+        class="btn btn-primary"
+        routerLink="/tasklists/new"
+      >
+        Create New Tasklist
+      </button>
     </div>
   </div>
 
   <div class="flex justify-end items-center mb-5">
-    <label for="filter" class="text-lg font-semibold text-white mx-4">Filter Tasks:</label>
-    <select id="filter" 
-            [(ngModel)]="filterOption" 
-            (change)="onFilterChange(filterOption)" 
-            class="px-4 py-2 pr-4 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+    <label for="filter" class="text-lg font-semibold text-white mx-4"
+      >Filter Tasks:</label
+    >
+    <select
+      id="filter"
+      [(ngModel)]="filterOption"
+      (change)="onFilterChange(filterOption)"
+      class="px-4 py-2 pr-4 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    >
       <option value="all" default>All Tasks</option>
       <option value="incompleted">Incomplete</option>
       <option value="completed">Complete</option>
@@ -23,36 +33,45 @@
   <span *ngIf="tasklists.length > 0">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       <ng-container matColumnDef="tasklistNumber">
-        <th mat-header-cell *matHeaderCellDef> Sn# </th>
+        <th mat-header-cell *matHeaderCellDef>Sn#</th>
         <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
       </ng-container>
-    
+
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Title </th>
+        <th mat-header-cell *matHeaderCellDef>Title</th>
         <td mat-cell *matCellDef="let element">{{ element.name }}</td>
       </ng-container>
-    
+
       <ng-container matColumnDef="creator">
-        <th mat-header-cell *matHeaderCellDef> Creator </th>
-        <td mat-cell *matCellDef="let element">{{ element.creator.firstName + ' ' + element.creator.lastName }}</td>
+        <th mat-header-cell *matHeaderCellDef>Creator</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.creator.firstName + " " + element.creator.lastName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="members">
-        <th mat-header-cell *matHeaderCellDef> Member </th>
-        <td mat-cell *matCellDef="let element">{{ element.tasklistMembers.length }}</td>
+        <th mat-header-cell *matHeaderCellDef>Member</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.tasklistMembers.length }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef> Created At </th>
+        <th mat-header-cell *matHeaderCellDef>Created At</th>
         <td mat-cell *matCellDef="let element">
-          {{ element.createdAt | date:'MM-dd-yyyy hh:mm a':'UTC'}}
+          {{ element.createdAt | date : "MM-dd-yyyy hh:mm a" : "UTC" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button [routerLink]="['/tasklists/edit', element.id]" *ngIf="currentUserId == element.creator.id">
+          <button
+            mat-icon-button
+            [routerLink]="['/tasklists/edit']"
+            [state]="{ tasklist: element }"
+            *ngIf="currentUserId === element.creator.id"
+          >
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button (click)="openTaskListPage(element)">
@@ -62,17 +81,21 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
     <mat-paginator
-      [length]="totalTasklists" 
-      [pageSizeOptions]="[5]" 
-      (page)="onPageChanged($event)" 
-      aria-label="Select page">
+      [length]="totalTasklists"
+      [pageSizeOptions]="[5]"
+      (page)="onPageChanged($event)"
+      aria-label="Select page"
+    >
     </mat-paginator>
   </span>
 
-  <div class="font-bold pt-8 border flex justify-center items-center align-center p-5 rounded-[10px]" *ngIf="tasklists.length === 0">
+  <div
+    class="font-bold pt-8 border flex justify-center items-center align-center p-5 rounded-[10px]"
+    *ngIf="tasklists.length === 0"
+  >
     <p>No TaskLists found</p>
   </div>
 </div>

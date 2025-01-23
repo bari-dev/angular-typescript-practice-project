@@ -13,12 +13,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { TasklistEditComponent } from './tasklist-edit/tasklist-edit.component';
 
 @NgModule({
   declarations: [
     TasklistComponent,
     AllTasklistComponent,
-    TasklistNewComponent 
+    TasklistNewComponent,
+    TasklistEditComponent 
   ],
   imports: [
     CommonModule,

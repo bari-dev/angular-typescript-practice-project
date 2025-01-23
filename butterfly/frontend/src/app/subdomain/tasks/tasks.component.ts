@@ -73,13 +73,13 @@ export class TasksComponent implements AfterViewInit, OnInit {
     }
     this.tasklist = this._subdomainAuthService.getTasklist();
   }
-
+  
   ngOnInit(): void { 
-    this.fetchTasks();
   }
-
+  
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
+    this.fetchTasks();
   }
 
   announceSortChange(sortState: Sort) {
