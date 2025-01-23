@@ -44,7 +44,7 @@
     <h3 class="font-semibold margin--bottom--0">Contributors:</h3>
     <ul>
       <li *ngFor="let contributor of contributors">
-        {{ contributor.name }}
+        {{ contributor.firstName + ' ' + contributor.lastName }}
         <button
           (click)="removeContributor(contributor)"
           class="text-red-500 ml-2"
@@ -53,18 +53,26 @@
         </button>
       </li>
     </ul>
-    <app-add-users [tasklist]="tasklist" task="task"></app-add-users>
+    <app-add-users [tasklist]="tasklist" [task]="task"></app-add-users>
   </div>
 
   <div class="mt-4">
     <button
+      *ngIf="task.completed == 0; else markAsIncomplete"
       (click)="markComplete()"
       class="bg-green-500 text-white py-1 px-4 rounded"
-      [disabled]="task.completed"
-      [ngClass]="{ 'bg-gray-400': task.completed }"
     >
       Mark as Complete
     </button>
+
+    <ng-template #markAsIncomplete>
+      <button
+        (click)="markComplete()"
+        class="bg-red-500 text-white py-1 px-4 rounded"
+      >
+        Mark as Incomplete
+      </button>
+    </ng-template>
   </div>
 
   <button

@@ -15,6 +15,7 @@ import { SubdomainAuthService } from '../../../core/services/subdomain-auth.serv
 })
 export class AddUsersComponent implements OnChanges {
   @Input() tasklist: any = null;
+  @Input() task: any = null;
   @Output() updateTask = new EventEmitter<any>();
 
   contributors: any[] = [];
@@ -36,19 +37,6 @@ export class AddUsersComponent implements OnChanges {
   }
 
   addContributor(): void {
-    let userEmail = this.newUser.trim();
-
-    if (!userEmail && !this.selectedMember) return;
-
-    if (this.selectedMember) {
-      userEmail = this.selectedMember.member.email;
-    }
-
-    if (!this.isValidEmail(userEmail)) {
-      this.errorMessage = 'Please enter a valid email address.';
-      return;
-    }
-
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -66,7 +54,7 @@ export class AddUsersComponent implements OnChanges {
       'Content-Type': 'application/json'
     });
 
-    this.http.post(`http://localhost:3000/api/v1/tasklists/${tasklistSlug}/addUser?userEmail=${userEmail}`, {}, { headers })
+    this.http.post(`http://localhost:3000/api/v1/tasklists/${tasklistSlug}/tasks/${this.task.id}/addUser?memberId=${this.selectedMember.memberId}`, {}, { headers })
       .pipe(
         catchError(error => {
           this.isLoading = false;
@@ -74,11 +62,11 @@ export class AddUsersComponent implements OnChanges {
           return of(null);
         })
       )
-      .subscribe(response => {
+      .subscribe((response: any) => {
         this.isLoading = false;
 
-        if (response) {
-          this.contributors.push({ name: userEmail });
+        if (response && response.users) {
+          this.contributors = response.users;
           this.emitTaskUpdate();
           this.closeModal();
         }
@@ -91,7 +79,7 @@ export class AddUsersComponent implements OnChanges {
   }
 
   private emitTaskUpdate(): void {
-    const updatedTask = { ...this.tasklist, contributors: this.contributors };
+    const updatedTask = { ...this.tasklist, users: this.contributors };
     this.updateTask.emit(updatedTask);
   }
 

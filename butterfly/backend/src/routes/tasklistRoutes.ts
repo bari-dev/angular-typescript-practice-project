@@ -1,7 +1,7 @@
 import tasklistController from '../controllers/tasklistController';
 import { Router } from 'express';
 import taskRoutes from './tasksRoutes';
-import tasklistMiddleware from '../middleware/tasklist';
+import subdomainTasklistMiddleware from '../middleware/subdomainTasklist';
 
 const router = Router();
 
@@ -16,6 +16,6 @@ router.put('/:taskListId', tasklistController.updateTaskList);
 router.delete('/:taskListId', tasklistController.deleteTaskList);
 
 // tasklist's tasks
-router.use('/:taskListSlug/tasks', tasklistMiddleware, taskRoutes);
+router.use('/:taskListSlug/tasks', subdomainTasklistMiddleware, taskRoutes);
 
 export default router;

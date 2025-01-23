@@ -59,7 +59,7 @@ const registerSchema = Joi.object({
 
 export const registerController: any = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { error } = loginSchema.validate(req.body);
+    const { error } = registerSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }

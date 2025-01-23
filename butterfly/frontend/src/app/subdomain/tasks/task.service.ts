@@ -27,4 +27,8 @@ export class TaskService {
   async getTaskBySearchFilter(input: string): Promise<TaskInterface[]> {
     return await this._clientApi.getTasksBySearchFilter(input);
   }
+
+  async toggleStatus(tasklistSlug: string, taskId: number): Promise<TaskInterface> {
+    return await this._clientApi.toggleTaskStatus(tasklistSlug, taskId);
+  }
 }

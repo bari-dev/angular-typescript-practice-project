@@ -10,9 +10,9 @@ declare global {
   }
 }
 
-const tasklistMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+const subdomainTasklistMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { taskListSlug } = req.params;
-
+  console.log(taskListSlug)
   try {
     const taskList = await tasklistService.findTaskListBySlug(taskListSlug)
     if (!taskList) {
@@ -24,7 +24,8 @@ const tasklistMiddleware = async (req: Request, res: Response, next: NextFunctio
     next();
   } catch (error) {
     res.status(500).json({ error: String(error) });
+    return
   }
 };
 
-export default tasklistMiddleware;
+export default subdomainTasklistMiddleware;

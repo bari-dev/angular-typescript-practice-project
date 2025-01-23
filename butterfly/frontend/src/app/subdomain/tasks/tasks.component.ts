@@ -98,7 +98,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
 
   getLinkForName(task: TaskDetailsInterface) {}
 
-  onTaskClick(task: any, ) {
+  onTaskClick(task: any) {
     this.selectedTaskDetails = task;
     this.isModalOpen = true;
   }

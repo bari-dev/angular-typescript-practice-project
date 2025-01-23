@@ -70,4 +70,14 @@ export class ButterflyClientApi {
       throw error;
     }
   }
+
+  async toggleTaskStatus(tasklistSlug: string, taskId: number): Promise<TaskInterface> {
+    try {
+      const response = await this.axiosInstance.patch(`/tasklists/${tasklistSlug}/tasks/${taskId}/toggleStatus`);
+      return response.data;
+    } catch (error) {
+      console.log("Error fetching tasks:", error);
+      throw error;
+    }
+  }
 }

@@ -40,23 +40,40 @@ class TaskListController {
     const userId = req.user?.id;
     const page = parseInt(req.query.page as string) || 1;
     const pageSize = parseInt(req.query.pageSize as string) || 5; 
-  
+    const filter = req.query.filterOption as string || 'all';
+    
     try {
-      const taskLists = await TaskListService.getAllTaskLists(Number(userId), page, pageSize);
-      const totalTaskLists = await TaskListService.getTaskListCount(Number(userId));
-
+      let taskLists;
+      let totalTaskLists;
+  
+      if (filter === 'incompleted') {
+        taskLists = await TaskListService.getAllIncompleteTaskLists(Number(userId), page, pageSize);
+        totalTaskLists = await TaskListService.getIncompleteTaskListCount(Number(userId));
+      } else if (filter === 'completed') {
+        taskLists = await TaskListService.getAllCompletedTaskLists(Number(userId), page, pageSize);
+        totalTaskLists = await TaskListService.getCompletedTaskListCount(Number(userId));
+        
+      } else if (filter === 'past_due') {
+        taskLists = await TaskListService.getAllPastDueTaskLists(Number(userId), page, pageSize);
+        totalTaskLists = await TaskListService.getPastDueTaskListCount(Number(userId));
+        
+      } else if (filter === 'all') {
+        taskLists = await TaskListService.getAllTaskLists(Number(userId), page, pageSize);
+        totalTaskLists = await TaskListService.getTaskListCount(Number(userId));
+      }
+  
       res.status(200).json({
         taskLists,
         totalTaskLists,
         page,
         pageSize
       });
-      return 
+  
     } catch (err) {
       res.status(500).json({ message: String(err) });
-      return;
     }
   }
+  
 
   async getTaskListById(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
@@ -108,10 +125,11 @@ class TaskListController {
   
     try {
       let query = `
-        SELECT tasklists.* 
+        SELECT tasklists.*, creator.*
         FROM TaskList AS tasklists
         JOIN Task ON tasklists.id = Task.tasklistId
         JOIN tasklistMember AS tasklistMembers ON tasklists.id = tasklistMembers.tasklistId
+        JOIN User as creator on tasklists.creatorId = creator.id
         WHERE tasklistMembers.memberId = :userId`;
   
       if (filter) {

@@ -19,25 +19,24 @@ import { TasklistService } from '../../../core/services/tasklist.service';
   ]
 })
 export class TaskDetailsComponent implements OnChanges {
-  tasklist: any = null;
-  @Input() task: any = null;
+  @Input() tasklist: any;
+  @Input() task: any;
   @Output() isModalOpen = new EventEmitter<boolean>(false);
   @Output() closeModal = new EventEmitter<void>();
 
   contributors: any[] = [];
 
-  constructor(private _subdomainAuthService: SubdomainAuthService, private taskService: TaskService, private _tasklist: TasklistService){
+  constructor(private _subdomainAuthService: SubdomainAuthService, private taskService: TaskService, private _tasklistService: TasklistService){
   }
   
   ngOnChanges(changes: SimpleChanges) {
     if (changes['task'] && this.task) {
-      this.tasklist = this.fetchTasklist();
+      this.task = changes['task'].currentValue
+      this.contributors = changes['task'].currentValue.users
+      this.tasklist = changes['tasklist'].currentValue
       this.isModalOpen.emit(true);
-      // this.contributors = this.task.contributors || [];
     }
   }
-
-  fetchTasklist = () => this._tasklist.getTasklistById(this._subdomainAuthService.getTasklist().id);
 
   closePanel() {
     this.isModalOpen.emit(false);
@@ -48,7 +47,9 @@ export class TaskDetailsComponent implements OnChanges {
 
   markComplete() {
     if (this.task) {
-      this.task.completed = 1;
+      this.taskService.toggleStatus(this.tasklist.slug, this.task.id).then(data=>{
+        this.task.completed = data.completed
+      });
     }
   }
 

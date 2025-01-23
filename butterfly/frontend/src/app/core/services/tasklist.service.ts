@@ -27,9 +27,9 @@ export class TasklistService {
     return headers;
   }
 
-  getTasklists(page: number = 1, pageSize: number = 5): Observable<any[]> {
+  getTasklists(page: number = 1, pageSize: number = 5, filterOption: string = 'all'): Observable<any[]> {
     const headers = this.getAuthHeaders();
-    return this.http.get<any[]>(`${this.apiUrl}?page=${page}&pageSize=${pageSize}`, { headers });
+    return this.http.get<any[]>(`${this.apiUrl}?page=${page}&pageSize=${pageSize}&filterOption=${filterOption}`, { headers });
   }
 
   createTasklist(newTasklist: any): Observable<any> {

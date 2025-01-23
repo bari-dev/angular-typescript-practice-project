@@ -2,8 +2,10 @@ import TasklistInterface from "interfaces/tasklist";
 import TaskList from "../models/tasklist";
 import User from "../models/user";
 import { TasklistWithUserInterface } from "interfaces/tasklistWithUser";
-import { UniqueConstraintError } from "sequelize";
+import { Op, UniqueConstraintError } from "sequelize";
 import TasklistMember from "../models/tasklistMembers";
+import Task from "../models/task";
+import TaskInterface from "../interfaces/task";
 
 class TaskListService {
   async createTaskList(name: string, creatorId: number, slug: string) {
@@ -27,8 +29,9 @@ class TaskListService {
 
   async getAllTaskLists(userId: number, page: number, pageSize: number) {
     try {
+      let tasklistMember = await TasklistMember.findAll({where: { memberId: userId }})
       const taskLists = await TaskList.findAll({
-        where: { creatorId: userId },
+        where: { id: tasklistMember.map(data=>data.tasklistId) },
         include: [
           {
             model: User,
@@ -53,9 +56,9 @@ class TaskListService {
     return TasklistMember.count({ where: { memberId: userId } });
   }
 
-  mapTasklistWithUserData(tasklist: any) {
-    console.log(tasklist);
-  }
+  // mapTasklistWithUserData(tasklist: any) {
+  //   console.log(tasklist);
+  // }
 
   async getTaskListById(taskListId: number): Promise<any> {
     try {
@@ -111,7 +114,16 @@ class TaskListService {
   }
 
   async findTaskListBySlug(slug: string) {
-    return TaskList.findOne({ where: { slug }, include: [{ model: User, as: 'users' }] });
+    return await TaskList.findOne({ where: { slug }, include: [{
+        model: User,
+        as: "creator",
+        attributes: ["id", "firstName", "lastName"],
+      },
+      {
+        model: TasklistMember,
+        as: 'tasklistMembers'
+      }] 
+    });
   }
 
   async addUserToTasklist(
@@ -154,6 +166,77 @@ class TaskListService {
     } catch (err) {
       throw new Error("Error adding user to task list: " + err);
     }
+  }
+
+  async getAllCompletedTaskLists(userId: number, page: number, pageSize: number) {
+    return TaskList.findAll({
+      where: { creatorId: userId },
+      include: [
+        { model: User, as: 'users' },
+        { model: Task, as: 'tasks', where: { completed: 1 } },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getCompletedTaskListCount(userId: number) {
+    return TaskList.count({
+      where: { creatorId: userId },
+      include: [
+        { model: Task, as: 'tasks', where: { completed: 1 } },
+      ],
+    });
+  }
+
+  async getAllIncompleteTaskLists(userId: number, page: number, pageSize: number) {
+    return TaskList.findAll({
+      where: { creatorId: userId },
+      include: [
+        { model: User, as: 'users' },
+        { model: Task, as: 'tasks', where: { completed: 0 } },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getIncompleteTaskListCount(userId: number) {
+    return TaskList.count({
+      where: { creatorId: userId },
+      include: [
+        { model: Task, as: 'tasks', where: { completed: 0 } },
+      ],
+    });
+  }
+
+  async getAllPastDueTaskLists(userId: number, page: number, pageSize: number) {
+    return TaskList.findAll({
+      where: {
+        creatorId: userId,
+      },
+      include: [
+        { model: User, as: 'users' },
+        { model: Task, as: 'tasks', where: {
+          deadline: { [Op.lt]: new Date() }
+        } },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getPastDueTaskListCount(userId: number) {
+    return TaskList.count({
+      where: {
+        creatorId: userId,
+      },
+      include: [
+        { model: Task, as: 'tasks', where: {
+          deadline: { [Op.lt]: new Date() }
+        }},
+      ],
+    });
   }
 }
 
