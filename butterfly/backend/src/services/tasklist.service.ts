@@ -38,7 +38,6 @@ class TaskListService {
           {
             model: TasklistMember,
             as: 'tasklistMembers',
-            attributes: ["id", "firstName", "lastName", "email"],
           }
         ],
         offset: (page - 1) * pageSize,
