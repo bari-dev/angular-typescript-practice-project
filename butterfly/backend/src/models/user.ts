@@ -32,6 +32,11 @@ class User extends Model {
       foreignKey: "memberId",
       as: "tasklistMembers"
     })
+
+    User.hasMany(TaskUser, {
+      foreignKey: "userId",
+      as: "userTasks"
+    })
   }
 }
 

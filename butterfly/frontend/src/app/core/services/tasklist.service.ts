@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from './auth.service'; 
 import { env } from 'src/environments/environment';
 import TasklistInterface from '../interfaces/models/tasklist.interface';
+import { SubdomainAuthService } from 'src/app/core/services/subdomain-auth.service';
 
 const BASE_URL = `${env.apiBaseUrl}/tasklists`;
 
@@ -13,11 +14,11 @@ const BASE_URL = `${env.apiBaseUrl}/tasklists`;
 export class TasklistService {
   private apiUrl = BASE_URL;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService, private subdomainAuthService: SubdomainAuthService) {}
 
   
   private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
+    const token = this.authService.getToken() || this.subdomainAuthService.getToken();
     let headers = new HttpHeaders();
 
     if (token) {
@@ -47,8 +48,9 @@ export class TasklistService {
     return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers });
   }
 
-  getTasklistById(id: string): Observable<any> {
-    const headers = this.getAuthHeaders();  
+  getTasklistById(id: string): any {
+    const headers = this.getAuthHeaders();
+    console.log('headers', headers);
     return this.http.get<TasklistInterface>(`${this.apiUrl}/${id}`, { headers });
   }
 }

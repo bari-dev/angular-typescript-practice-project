@@ -5,6 +5,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import TasklistInterface from 'src/app/core/interfaces/models/tasklist.interface';
 import { AuthService } from '../../../../core/services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-all-tasklist',
@@ -16,12 +18,12 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['tasklistNumber', 'name', 'creator', 'members', 'createdAt', 'actions'];
   currentUserId?: number;
   dataSource: MatTableDataSource<TasklistInterface>;
-  filterOption: string = 'all';
   totalTasklists: number = 0;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private tasklistService: TasklistService,
+    private dialog: MatDialog,
     private _authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private router: Router
@@ -31,13 +33,7 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      const filter = params['filter'];
-      if (filter) {
-        this.filterOption = filter;
-        this.loadTasklists(1, 5);
-      }
-    });
+    
   }
 
   ngAfterViewInit(): void {
@@ -46,7 +42,7 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
   }
 
   loadTasklists(page: number = 1, pageSize: number = 5): void {
-    this.tasklistService.getTasklists(page, pageSize, this.filterOption).subscribe(
+    this.tasklistService.getTasklists(page, pageSize).subscribe(
       (data: any) => {
         this.tasklists = data.taskLists;
         this.dataSource.data = this.tasklists;
@@ -56,6 +52,31 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
         console.error('Error loading tasklists:', error);
       }
     );
+  }
+
+  deleteTasklist(deletedTasklist: any): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        message: `Are you sure you want to delete this ${deletedTasklist.name} tasklist?`,
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tasklistService.deleteTasklist(deletedTasklist.id).subscribe(
+          () => {
+            this.tasklists = this.tasklists.filter(tasklist => tasklist.id !== Number(deletedTasklist.id));
+            this.dataSource.data = this.tasklists;
+            this.dataSource.filter = '';
+          },
+          (error: any) => {
+            console.error('Error deleting tasklist:', error);
+          }
+        );
+      }
+    });
   }
 
   openTaskListPage(tasklist: TasklistInterface): void {
@@ -68,17 +89,5 @@ export class AllTasklistComponent implements OnInit, AfterViewInit {
     const pageIndex = event.pageIndex + 1;
     const pageSize = event.pageSize;
     this.loadTasklists(pageIndex, pageSize);
-  }
-
-  onFilterChange(option: string): void {
-    this.filterOption = option;
-
-    this.router.navigate([], {
-      relativeTo: this.activatedRoute,
-      queryParams: { filter: this.filterOption },
-      queryParamsHandling: 'merge',
-    });
-
-    this.loadTasklists(1, 5);
   }
 }

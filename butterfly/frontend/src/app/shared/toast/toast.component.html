@@ -1,4 +1,4 @@
-<div class="toast-container" *ngIf="showToast">
+<div *ngIf="showToast" class="toast-container fixed bottom-5 right-5 z-50">
   <div class="slds-notify_container slds-is-relative">
     <div
       [ngClass]="{
@@ -7,13 +7,12 @@
         'slds-theme_success': toastType === 'success',
         'slds-theme_error': toastType === 'error'
       }"
+      class="transform transition-all opacity-0 animate-fadeInOut"
       role="status"
     >
       <span class="slds-assistive-text">{{ toastType }}</span>
       <span
-        class="slds-icon_container slds-icon-utility-{{
-          toastType
-        }} slds-m-right_small slds-no-flex slds-align-top"
+        class="slds-icon_container slds-icon-utility-{{ toastType }} slds-m-right_small slds-no-flex slds-align-top"
       >
         <svg class="slds-icon slds-icon_small">
           <use
@@ -26,16 +25,14 @@
       <div class="slds-notify__content">
         <div *ngIf="toastMessage.indexOf(',') !== -1; else elseBlock">
           <h2 class="slds-text-heading_small">
-            {{ toastMessage.split(",")[0] }}
+            {{ toastMessage.split(',')[0] }}
           </h2>
           <p class="word-break">
-            {{ toastMessage.split(",")[1] }}
+            {{ toastMessage.split(',')[1] }}
           </p>
         </div>
         <ng-template #elseBlock>
-          <p class="word-break">
-            {{ toastMessage }}
-          </p>
+          <p class="word-break">{{ toastMessage }}</p>
         </ng-template>
       </div>
       <div class="slds-notify__close">
@@ -44,9 +41,7 @@
           title="Close"
           (click)="closeToast()"
         >
-          <svg
-            class="slds-button__icon slds-button__icon_large"
-          >
+          <svg class="slds-button__icon slds-button__icon_large">
             <use
               xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"
             ></use>

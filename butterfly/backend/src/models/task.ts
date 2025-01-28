@@ -26,6 +26,11 @@ class Task extends Model {
       foreignKey: "taskId",
       as: "users"
     });
+
+    TaskList.hasMany(TaskUser, {
+      foreignKey: "taskId",
+      as: "assignedUsers"
+    })
   }
 }
 

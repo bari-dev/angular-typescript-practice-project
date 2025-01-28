@@ -1,15 +1,14 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { TaskDetailsComponent } from './task-details/task-details.component';
 import { SubdomainAuthService } from '../../core/services/subdomain-auth.service';
-import TasklistInterface from '../../core/interfaces/models/tasklist.interface';
 import TaskDetailsInterface from '../../core/interfaces/models/tasklist.interface';
 import { TaskService } from './task.service';
 import { TaskInterface } from '../../core/interfaces/models/task.interface';
@@ -19,6 +18,7 @@ import { CountdownComponent } from '../../shared/countdown/countdown.component';
 import { AddUsersComponent } from './add-users/add-users.component';
 import { ContributorsComponent } from './contributors/contributors.component';
 import { AddMemberComponent } from './add-member/add-member.component';
+import { TasklistService } from '../../core/services/tasklist.service';
 
 @Component({
   selector: 'app-tasks',
@@ -40,24 +40,25 @@ import { AddMemberComponent } from './add-member/add-member.component';
     AddMemberComponent
   ],
 })
-export class TasksComponent implements AfterViewInit, OnInit {
+export class TasksComponent implements OnInit {
   tasks: TaskInterface[] = [];
   openModal: boolean = false;
   isModalOpen: boolean = false;
   selectedTask: TaskDetailsInterface | null = null;
   selectedTaskDetails: TaskDetailsInterface | null = null;
-  tasklist: TasklistInterface;
+  tasklist: any;
   showAlert: boolean = false;
   alertMessage: string = '';
   searchQuery: string = '';
   currentPage: number = 1;
   batchSize: number = 27;
+  filterOption: string = 'all';
   total: number = 0;
   searchResults: TaskInterface[] = [];
   loading: boolean = false;
   displayedColumns: string[] = ['sn', 'title', 'due-date', 'status', 'actions'];
   dataSource = new MatTableDataSource<TaskInterface>();
-  taskListSlug: string = '';
+  tasklistId: string = '';
 
   @ViewChild(MatSort) sort: MatSort | null = null;
 
@@ -66,22 +67,34 @@ export class TasksComponent implements AfterViewInit, OnInit {
     private router: Router,
     private _subdomainAuthService: SubdomainAuthService,
     private _taskService: TaskService,
-    private dialog: MatDialog
+    private _tasklistService: TasklistService,
+    private dialog: MatDialog,
+    private activatedRoute: ActivatedRoute,
   ) {
     if (!this._subdomainAuthService.isAuthenticated()) {
       this.router.navigateByUrl('/');
     }
     this.tasklist = this._subdomainAuthService.getTasklist();
+    this.tasklistId = this.tasklist.id
   }
   
-  ngOnInit(): void { 
-  }
+  ngOnInit(): void {
+    this.activatedRoute.queryParams.subscribe(async (params) => {
+      const filter = params['filter'];
   
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-    this.fetchTasks();
-  }
-
+      if (filter && filter !== this.filterOption) {
+        this.filterOption = filter;
+      }
+  
+      try {
+        await this.fetchTasklist();
+        await this.fetchTasks();
+      } catch (error) {
+        console.error('Error fetching tasklist or tasks:', error);
+      }
+    });
+  }  
+  
   announceSortChange(sortState: Sort) {
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
@@ -96,8 +109,6 @@ export class TasksComponent implements AfterViewInit, OnInit {
     this.openModal = true;
   }
 
-  getLinkForName(task: TaskDetailsInterface) {}
-
   onTaskClick(task: any) {
     this.selectedTaskDetails = task;
     this.isModalOpen = true;
@@ -107,15 +118,32 @@ export class TasksComponent implements AfterViewInit, OnInit {
     this.isModalOpen = false;
   }
 
+  fetchTasklist() {
+    this.loading = true;
+    this._tasklistService.getTasklistById(this._subdomainAuthService.getTasklist().id).subscribe({
+      next: (tasklist: any) => {
+        this.tasklist = tasklist;
+        console.log('tasklist', tasklist);
+      },
+      error: (error: any) => {
+        this.showAlert = true;
+        this.alertMessage = error.error?.message || 'An error occurred';
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
   async fetchTasks() {
     this.loading = true;
     try {
-      const tasks = await this._taskService.getTasks(this.tasklist.slug);
-      this.tasks = tasks;
-      this.dataSource = new MatTableDataSource(tasks);
-    } catch (error) {
+      const data: any = await this._taskService.getTaskBySearchFilter(this._subdomainAuthService.getTasklist().slug, this.filterOption);
+      this.tasks = data.tasks;
+      this.dataSource = new MatTableDataSource(data.tasks);
+    } catch (error: any) {
       this.showAlert = true;
-      this.alertMessage = 'Error fetching tasks. Please try again later.';
+      this.alertMessage = error.error.message;
     } finally {
       this.loading = false;
     }
@@ -132,7 +160,7 @@ export class TasksComponent implements AfterViewInit, OnInit {
 
   openAddTaskModal(task?: TaskInterface): void {
     this.dialog.closeAll();
-    const dialogRef = this.dialog
+    this.dialog
       .open(AddTaskComponent, {
         width: '500px',
         data: task
@@ -150,5 +178,34 @@ export class TasksComponent implements AfterViewInit, OnInit {
           }
         }
       });
+  }
+
+  openAddMemberDialog(): void {
+    const dialogRef = this.dialog.open(AddMemberComponent, {
+      width: '500px',
+      data: this.tasklist,
+    });
+  
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.fetchTasks();
+      }
+    });
+  }
+
+  onFilterChange(option: string): void {
+    this.filterOption = option;
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { filter: this.filterOption },
+      queryParamsHandling: 'merge',
+    });
+
+    this.fetchTasks();
+  }
+
+  async onTasklistUpdate(updatedTasklist: any): Promise<void> {
+    await this.fetchTasklist();
   }
 }

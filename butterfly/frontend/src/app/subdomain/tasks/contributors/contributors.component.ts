@@ -12,27 +12,19 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './contributors.component.html',
   styleUrls: ['./contributors.component.css'],
 })
-export class ContributorsComponent implements OnChanges {
+export class ContributorsComponent {
   @Input() tasklist: any = null;
 
   tasklistMembers: any[] = [];
   showModal: boolean = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tasklist'] && this.tasklist) {
-      this.tasklistMembers = this.tasklist.members || [];
-    }
-  }
-
   openModal(): void {
+    this.tasklistMembers = this.tasklist.users || [];
     this.showModal = true;
   }
 
   closeDialog(): void {
+    this.tasklistMembers = [];
     this.showModal = false;
-  }
-
-  closePanel(): void {
-    this.tasklist = null;
   }
 }

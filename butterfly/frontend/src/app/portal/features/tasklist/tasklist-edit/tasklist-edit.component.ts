@@ -32,9 +32,9 @@ export class TasklistEditComponent {
     if (this.tasklistName.trim()) {
       this.isSubmitting = true;
 
-      const newTasklist = { name: this.tasklistName };
+      const editTasklist = { name: this.tasklistName };
 
-      this.tasklistService.createTasklist(newTasklist).subscribe(
+      this.tasklistService.updateTasklist(this.tasklist.id, editTasklist).subscribe(
         (response) => {
           this.tasklistName = '';
           this.errorMessage = '';

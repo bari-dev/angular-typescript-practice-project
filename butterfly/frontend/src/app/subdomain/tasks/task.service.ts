@@ -20,12 +20,12 @@ export class TaskService {
     return (await this._clientApi.createTask({ input })).task;
   }
 
-  async updateTask(task: TaskInterface, tasklistId: number): Promise<TaskInterface> {
-    return (await this._clientApi.editTasksById({ task, tasklistId })).task;
+  async updateTask(task: TaskInterface, taskId: number, taskListSlug: string): Promise<TaskInterface> {
+    return (await this._clientApi.editTasksById({ task, taskId, taskListSlug })).task;
   }
 
-  async getTaskBySearchFilter(input: string): Promise<TaskInterface[]> {
-    return await this._clientApi.getTasksBySearchFilter(input);
+  async getTaskBySearchFilter(slug: string, input: string): Promise<TaskInterface[]> {
+    return await this._clientApi.getTasksBySearchFilter(slug, input);
   }
 
   async toggleStatus(tasklistSlug: string, taskId: number): Promise<TaskInterface> {

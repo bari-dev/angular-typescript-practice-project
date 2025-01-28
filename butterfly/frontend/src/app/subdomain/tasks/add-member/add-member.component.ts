@@ -15,10 +15,10 @@ import { SubdomainAuthService } from '../../../core/services/subdomain-auth.serv
 })
 export class AddMemberComponent implements OnChanges {
   @Input() tasklist: any = null;
-  @Output() updateTask = new EventEmitter<any>();
+  @Output() updateTasklist = new EventEmitter<any>();
 
   contributors: any[] = [];
-  newUserEmail: string = ''; // Renamed variable for clarity
+  newUserEmail: string = '';
   showModal: boolean = false;
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -89,19 +89,17 @@ export class AddMemberComponent implements OnChanges {
   }
 
   private emitTaskUpdate(): void {
-    const updatedTask = { ...this.tasklist, users: this.contributors };
-    this.updateTask.emit(updatedTask);
+    const tasklist = { ...this.tasklist, users: this.contributors };
+    this.updateTasklist.emit(tasklist);
   }
 
   openModal(): void {
     this.showModal = true;
-    this.newUserEmail = ''; // Reset input when modal is opened
-    this.errorMessage = '';
   }
 
   closeModal(): void {
     this.showModal = false;
-    this.newUserEmail = ''; // Reset input when modal is closed
+    this.newUserEmail = '';
     this.errorMessage = '';
   }
 

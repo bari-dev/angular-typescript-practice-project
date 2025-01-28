@@ -39,8 +39,9 @@ class TaskListService {
             attributes: ["id", "firstName", "lastName"],
           },
           {
-            model: TasklistMember,
-            as: 'tasklistMembers',
+            model: User,
+            as: 'users',
+            attributes: ["id", "firstName", "lastName", "email"],
           }
         ],
         offset: (page - 1) * pageSize,
@@ -56,10 +57,6 @@ class TaskListService {
     return TasklistMember.count({ where: { memberId: userId } });
   }
 
-  // mapTasklistWithUserData(tasklist: any) {
-  //   console.log(tasklist);
-  // }
-
   async getTaskListById(taskListId: number): Promise<any> {
     try {
       const taskList = await TaskList.findByPk(taskListId, {
@@ -70,8 +67,8 @@ class TaskListService {
             attributes: ["id", "firstName", "lastName"],
           },
           {
-            model: TasklistMember,
-            as: 'tasklistMembers',
+            model: User,
+            as: 'users',
             attributes: ["id", "firstName", "lastName", "email"],
           }
         ],

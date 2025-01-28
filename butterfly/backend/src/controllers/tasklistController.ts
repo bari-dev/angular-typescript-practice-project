@@ -77,6 +77,7 @@ class TaskListController {
 
   async getTaskListById(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
+    console.log(taskListId);
     try {
       const taskList = await TaskListService.getTaskListById(Number(taskListId));
       res.status(200).json(taskList);

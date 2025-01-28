@@ -1,0 +1,18 @@
+/* Tailwind CSS animation for fading */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.toast-container .animate-fadeInOut {
+  animation: fadeInOut 3s ease-in-out;
+}

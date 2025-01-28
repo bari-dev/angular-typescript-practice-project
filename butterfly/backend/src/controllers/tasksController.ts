@@ -3,9 +3,11 @@ import TaskService from "../services/task.service";
 
 class TaskController {
   async createTask(req: Request, res: Response): Promise<void> {
-    const { title, description, tasklistSlug, deadline, completed } = req.body.input;
+    const { title, description, tasklistSlug, deadline, completed } =
+      req.body.input;
     try {
-      if(tasklistSlug !== req.tasklist?.slug) throw new Error('Invalid request.')
+      if (tasklistSlug !== req.tasklist?.slug)
+        throw new Error("Invalid request.");
       let taskSlug = title
         .toLowerCase()
         .replace(/\s+/g, "-")
@@ -40,22 +42,59 @@ class TaskController {
   }
 
   async getAllTasks(req: Request, res: Response): Promise<void> {
-    const tasklist = req.tasklist;
-  
+    const tasklistId = req.tasklist?.id;
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = parseInt(req.query.pageSize as string) || 5;
+    const filter = req.query.filter ?? "all";
+
     try {
-      const tasks = await TaskService.getAllTasks(Number(tasklist?.id));
-      
-      if (tasks.length === 0) {
-        res.status(200).json({ message: 'No tasks found for the current user in this tasklist.' });
-        return;
+      let tasks;
+      let totalTasks;
+
+      if (filter === "incompleted") {
+        tasks = await TaskService.getAllIncompletedTasks(
+          Number(tasklistId),
+          page,
+          pageSize
+        );
+        totalTasks = await TaskService.getAllIncompletedTasksCount(
+          Number(tasklistId)
+        );
+      } else if (filter === "completed") {
+        tasks = await TaskService.getAllCompletedTasks(
+          Number(tasklistId),
+          page,
+          pageSize
+        );
+        totalTasks = await TaskService.getAllCompletedTasksCount(
+          Number(tasklistId)
+        );
+      } else if (filter === "past_due") {
+        tasks = await TaskService.getAllPastDueTasks(
+          Number(tasklistId),
+          page,
+          pageSize
+        );
+        totalTasks = await TaskService.getAllPastDueTasksCount(
+          Number(tasklistId)
+        );
+      } else if(filter === 'all') {
+        tasks = await TaskService.getAllTasks(
+          Number(tasklistId),
+          page,
+          pageSize
+        );
+        totalTasks = await TaskService.getAllTasksCount(Number(tasklistId));
       }
-  
-      res.status(200).json(tasks);
-      return;
+
+      res.status(200).json({
+        tasks,
+        totalTasks,
+        page,
+        pageSize,
+      });
     } catch (err) {
-      console.error('Error fetching tasks:', err);
-      res.status(500).json({ message: 'An error occurred while fetching tasks.' });
-      return;
+      res.status(500).json({ message: String(err) });
     }
   }
 
@@ -73,7 +112,7 @@ class TaskController {
 
   async updateTask(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
-    const { title, description, completed, deadline } = req.body;
+    const { title, description, completed, deadline } = req.body.task;
     try {
       const updatedTask = await TaskService.updateTask(
         Number(taskId),
@@ -122,24 +161,28 @@ class TaskController {
     const { memberId } = req.query;
     const { taskId } = req.params;
     const tasklist = req.tasklist;
-  
+
     try {
-      const existingMember = tasklist?.tasklistMembers?.find(mbr => mbr.id === memberId);
-  
+      const existingMember = tasklist?.tasklistMembers?.find(
+        (mbr) => mbr.id === memberId
+      );
+
       if (existingMember !== undefined) {
-        throw new Error('Member not found in tasklist.');
+        throw new Error("Member not found in tasklist.");
       }
-  
+
       let task = await TaskService.getTaskById(Number(taskId));
       if (!task) {
-        throw new Error('Task not found.');
+        throw new Error("Task not found.");
       }
-  
-      await TaskService.createTaskUser(Number(memberId), Number(taskId));  
+
+      await TaskService.createTaskUser(Number(memberId), Number(taskId));
       task = await TaskService.getTaskById(Number(taskId));
-      res.status(200).json(task);  
+      res.status(200).json(task);
     } catch (err) {
-      res.status(500).json({ message: err instanceof Error ? err.message : String(err) });
+      res
+        .status(500)
+        .json({ message: err instanceof Error ? err.message : String(err) });
       return;
     }
   }

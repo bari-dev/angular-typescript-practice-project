@@ -32,7 +32,7 @@ export class AddUsersComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tasklist'] && this.tasklist) {
-      this.contributors = this.tasklist.tasklistMembers || [];
+      this.contributors = this.tasklist.users || [];
     }
   }
 
@@ -54,7 +54,7 @@ export class AddUsersComponent implements OnChanges {
       'Content-Type': 'application/json'
     });
 
-    this.http.post(`http://localhost:3000/api/v1/tasklists/${tasklistSlug}/tasks/${this.task.id}/addUser?memberId=${this.selectedMember.memberId}`, {}, { headers })
+    this.http.post(`http://localhost:3000/api/v1/tasklists/${tasklistSlug}/tasks/${this.task.id}/addUser?memberId=${this.selectedMember.id}`, {}, { headers })
       .pipe(
         catchError(error => {
           this.isLoading = false;
@@ -85,9 +85,6 @@ export class AddUsersComponent implements OnChanges {
 
   openModal(): void {
     this.showModal = true;
-    this.newUser = '';
-    this.selectedMember = null;
-    this.errorMessage = '';
   }
 
   closeModal(): void {

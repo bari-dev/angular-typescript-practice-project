@@ -31,9 +31,9 @@ export class ButterflyClientApi {
     }
   }
 
-  async createTask(params: { input: TaskInterface }): Promise<{ task: TaskInterface }> {
+  async createTask(params: { input: any }): Promise<{ task: TaskInterface }> {
     try {
-      const response = await this.axiosInstance.post(`/tasklists/${this._subdomainAuthService.getTasklist().slug}/tasks`, params);
+      const response = await this.axiosInstance.post(`/tasklists/${params.input.tasklistSlug}/tasks`, params);
       return { task: response.data };
     } catch (error) {
       console.log("Error creating task:", error);
@@ -41,9 +41,9 @@ export class ButterflyClientApi {
     }
   }
 
-  async editTasksById(params: { task: TaskInterface; tasklistId: number}): Promise<{ task: TaskInterface }> {
+  async editTasksById(params: { task: TaskInterface; taskId: number, taskListSlug: string}): Promise<{ task: TaskInterface }> {
     try {
-      const response = await this.axiosInstance.put(`tasklist/${params.tasklistId}/tasks/${params.task.id}`, params);
+      const response = await this.axiosInstance.put(`tasklists/${params.taskListSlug}/tasks/${params.taskId}`, params);
       return { task: response.data.task };
     } catch (error) {
       console.log("Error editing task:", error);
@@ -51,9 +51,9 @@ export class ButterflyClientApi {
     }
   }
 
-  async getTasksBySearchFilter(input: string): Promise<TaskInterface[]> {
+  async getTasksBySearchFilter(slug: string, input: string): Promise<TaskInterface[]> {
     try {
-      const response = await this.axiosInstance.get(`/tasks?filter=${input}`);
+      const response = await this.axiosInstance.get(`/tasklists/${slug}/tasks?filter=${input}`);
       return response.data;
     } catch (error) {
       console.log("Error fetching tasks:", error);

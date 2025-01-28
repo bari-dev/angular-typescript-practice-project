@@ -1,9 +1,10 @@
+import { Op } from "sequelize";
 import Task from "../models/task";
+import TaskList from "../models/tasklist";
 import TaskUser from "../models/taskuser";
 import User from "../models/user";
 
 class TaskService {
-  // Create a new Task
   async createTask(
     title: string,
     description: string,
@@ -21,7 +22,7 @@ class TaskService {
         completed,
         deadline,
         slug,
-        creatorId
+        creatorId,
       });
       return task;
     } catch (error) {
@@ -29,32 +30,15 @@ class TaskService {
     }
   }
 
-  async getAllTasks(taskListId: number) {
-    try {
-      const tasks = await Task.findAll({ where: { taskListId }, order: [['createdAt', 'desc']], include: [
-        {
-          model: User,
-          as: 'creator'
-        },
-        {
-          model: User,
-          as: 'users'
-        }
-      ] });
-      return tasks;
-    } catch (error) {
-      throw new Error("Error fetching tasks: " + error);
-    }
-  }
-
-  // Get task by ID
   async getTaskById(taskId: number) {
     try {
       const task = await Task.findByPk(taskId, {
-        include: [{
-          model: User,
-          as: 'users'
-        }]
+        include: [
+          {
+            model: User,
+            as: "users",
+          },
+        ],
       });
       if (!task) throw new Error("Task not found");
       return task;
@@ -63,7 +47,6 @@ class TaskService {
     }
   }
 
-  // Update task
   async updateTask(
     taskId: number,
     title: string,
@@ -85,7 +68,6 @@ class TaskService {
     }
   }
 
-  // Delete task
   async deleteTask(taskId: number) {
     try {
       const task = await Task.findByPk(taskId);
@@ -131,15 +113,124 @@ class TaskService {
       }
       return await TaskUser.create({
         taskId,
-        userId
+        userId,
       });
     } catch (error: any) {
-      if (error.name === 'SequelizeUniqueConstraintError'){
-        throw new Error('This member already added to this task.')
-      }else{
+      if (error.name === "SequelizeUniqueConstraintError") {
+        throw new Error("This member already added to this task.");
+      } else {
         throw new Error(error as string);
       }
     }
+  }
+
+  async getAllTasks(id: number, page: number, pageSize: number) {
+    try {
+      const tasks = await Task.findAll({
+        where: { taskListId: id },
+        order: [["createdAt", "desc"]],
+        include: [
+          {
+            model: User,
+            as: "creator",
+            attributes: ["id", "firstName", "lastName", "email"],
+          }
+        ],
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
+      });
+      return tasks;
+    } catch (error: any) {
+      throw new Error(`Error fetching tasks: ${error.message}`);
+    }
+  }
+
+  async getAllCompletedTasks(
+    taskListId: number,
+    page: number,
+    pageSize: number
+  ) {
+    return await Task.findAll({
+      where: { taskListId, completed: 1 },
+      order: [["createdAt", "desc"]],
+      include: [
+        { model: User, as: "creator" },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getAllIncompletedTasks(
+    taskListId: number,
+    page: number,
+    pageSize: number
+  ) {
+    return Task.findAll({
+      where: { taskListId, completed: 0 },
+      order: [["createdAt", "desc"]],
+      include: [
+        { model: User, as: "creator" },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getAllPastDueTasks(taskListId: number, page: number, pageSize: number) {
+    return Task.findAll({
+      where: { taskListId, deadline: { [Op.lt]: new Date() } },
+      order: [["createdAt", "desc"]],
+      include: [
+        { model: User, as: "creator" },
+      ],
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    });
+  }
+
+  async getAllTasksCount(taskListId: number) {
+    try {
+      const tasks = await Task.count({
+        where: { taskListId },
+        include: [
+          {
+            model: User,
+            as: "creator",
+          }
+        ],
+      });
+      return tasks;
+    } catch (error: any) {
+      throw new Error(`Error fetching tasks: ${error.message}`);
+    }
+  }
+
+  async getAllCompletedTasksCount(taskListId: number) {
+    return Task.count({
+      where: { taskListId, completed: 1 },
+      include: [
+        { model: User, as: "creator" },
+      ],
+    });
+  }
+
+  async getAllIncompletedTasksCount(taskListId: number) {
+    return Task.count({
+      where: { taskListId, completed: 0 },
+      include: [
+        { model: User, as: "creator" },
+      ],
+    });
+  }
+
+  async getAllPastDueTasksCount(taskListId: number) {
+    return Task.count({
+      where: { taskListId, deadline: { [Op.lt]: new Date() } },
+      include: [
+        { model: User, as: "creator" },
+      ],
+    });
   }
 }
 

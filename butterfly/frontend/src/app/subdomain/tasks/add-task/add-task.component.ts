@@ -88,7 +88,7 @@ export class AddTaskComponent implements OnInit {
 
     try {
       if (this.task) {
-        await this.taskService.updateTask(newTask, this.task.id);
+        await this.taskService.updateTask(newTask, this.task.id, this._subdomainAuthService.getTasklist().slug);
       } else {
         this.task = await this.taskService.createTask(newTask);
       }

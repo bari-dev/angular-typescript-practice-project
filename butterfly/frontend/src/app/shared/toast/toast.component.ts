@@ -1,39 +1,40 @@
-import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
-import { ToastService } from "./toast.service";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ToastService, Toast } from './toast.service';
+import { Subscription } from 'rxjs';
 
 @Component({
-  selector: "app-toast",
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: "./toast.component.html",
-  styleUrls: ["./toast.component.scss"],
+  selector: 'app-toast',
+  templateUrl: './toast.component.html',
+  styleUrls: ['./toast.component.css'],
 })
-export class ToastComponent {
+export class ToastComponent implements OnInit, OnDestroy {
+  toastMessage: string = '';
+  toastType: 'success' | 'error' = 'success';
   showToast: boolean = false;
-  toastMessage: string = "";
-  toastType: string;
+  private toastSubscription?: Subscription;
 
   constructor(private toastService: ToastService) {}
 
-  ngOnInit() {
-    this.toastService.toast$.subscribe(
-      (toastData: { message: string; type: "success" | "error" }) => {
-        this.showToast = false;
-        if (toastData && toastData.type && toastData.message) {
-          this.showToast = true;
-          this.toastMessage = toastData.message;
-          this.toastType = toastData.type;
-        }
+  ngOnInit(): void {
+    this.toastSubscription = this.toastService.toastState$.subscribe(
+      (toast: Toast) => {
+        this.toastMessage = toast.message;
+        this.toastType = toast.type;
+        this.showToast = true;
         setTimeout(() => {
-          this.closeToast();
-        }, 7000);
+          this.showToast = false;
+        }, toast.duration);
       }
     );
   }
 
+  ngOnDestroy(): void {
+    if (this.toastSubscription) {
+      this.toastSubscription.unsubscribe();
+    }
+  }
+
   closeToast() {
     this.showToast = false;
-    this.toastMessage = "";
   }
 }

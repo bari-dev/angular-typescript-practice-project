@@ -1,5 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/database";
+import User from "./user";
+import Task from "./task";
 
 class TaskUser extends Model {
   public id!: number;
@@ -7,6 +9,18 @@ class TaskUser extends Model {
   public taskId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  static associate() {
+    TaskUser.belongsTo(User, {
+      foreignKey: "userId",
+      as: "assignedUser"
+    })
+
+    TaskUser.belongsTo(Task, {
+      foreignKey: "taskId",
+      as: "task"
+    })
+  }
 }
 
 TaskUser.init(

@@ -5,7 +5,7 @@
     </div>
     <span>
       <app-contributors [tasklist]="tasklist"></app-contributors>
-      <app-add-member [tasklist]="tasklist"></app-add-member>
+      <app-add-member [tasklist]="tasklist" (updateTasklist)="onTasklistUpdate($event)"></app-add-member>
       <button 
         (click)="openAddTaskModal()"
         class="hover:bg-red-500 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mr-3">
@@ -18,9 +18,28 @@
     </span>
   </div>
 </header>
+
 <div class="flex h-screen bg-[#212121] w-full">
-  <span class="flex flex-col border-2 border-[#212121]"
-    [ngClass]="{'w-[70%] justify-start items-start': isModalOpen, 'w-[100%]': !isModalOpen}">
+  <span class="flex flex-col border-2 border-[#212121] rounded-lg"
+    [ngClass]="{'w-[70%] justify-start items-start': isModalOpen, 'w-[100%] mx-4': !isModalOpen}">
+
+    <div class="flex justify-end items-end mb-5 mx-4">
+      <label for="filter" class="text-lg font-semibold text-white mx-4"
+        >Filter Tasks:</label
+      >
+      <select
+        id="filter"
+        [(ngModel)]="filterOption"
+        (change)="onFilterChange(filterOption)"
+        class="px-4 py-2 pr-4 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      >
+        <option value="all" default>All Tasks</option>
+        <option value="incompleted">Incomplete</option>
+        <option value="completed">Complete</option>
+        <option value="past_due">Past Due</option>
+      </select>
+    </div>
+
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
       <ng-container matColumnDef="sn" class="w-[2px]">
         <th mat-header-cell *matHeaderCellDef> Sn# </th>
