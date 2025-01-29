@@ -18,6 +18,7 @@ import { MatCardModule } from '@angular/material/card';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SalaeforceComponent } from './features/salaeforce/salaeforce.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { SettingsComponent } from './features/settings/settings.component';
     MatButtonModule,
     MatListModule,
     MatDividerModule,
-    MatCardModule
+    MatCardModule,
+    FormsModule
   ]
 })
 export class PortalModule { }

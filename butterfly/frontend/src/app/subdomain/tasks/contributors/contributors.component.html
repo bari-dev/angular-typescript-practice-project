@@ -2,17 +2,25 @@
   *ngIf="showModal"
   class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
 >
-  <div class="p-6 rounded-lg w-96 bg-[#212121] relative">
+  <div class="p-6 rounded-lg w-[30%] bg-[#212121] relative">
     <button (click)="closeDialog()" 
             class="absolute top-2 right-2 text-white px-4 py-2 rounded-md font-semibold">
       <mat-icon>close</mat-icon>
     </button>
   
-    <div class="text-white bg-[#424242] my-3 p-2 rounded-lg mt-5">
+    <div class="text-white bg-[#424242] my-3 p-2 rounded-lg mt-5 flex justify-between items-center flex-col w-100">
       <h2 class="m--b-0">Members</h2>
       <ul class="p-3">
-        <li *ngFor="let memberMember of tasklistMembers">
-          {{ memberMember.firstName + " " + memberMember.lastName }} -> {{ memberMember.email }}
+        <li *ngFor="let member of tasklistMembers" class="flex justify-between items-center border-b border-gray-500 p-2 mb-2">
+          {{ member.firstName + " " + member.lastName }} -> {{ member.email }}
+
+          <button
+            (click)="removeMember(member)"
+            class="text-red-500 ml-2"
+            *ngIf="isCreator"
+          >
+            Remove
+        </button>
         </li>
       </ul>
     </div>

@@ -5,7 +5,7 @@
     </div>
     <span>
       <app-contributors [tasklist]="tasklist"></app-contributors>
-      <app-add-member [tasklist]="tasklist" (updateTasklist)="onTasklistUpdate($event)"></app-add-member>
+      <app-add-member *ngIf="isActionAllow" [tasklist]="tasklist" (updateTasklist)="onTasklistUpdate($event)"></app-add-member>
       <button 
         (click)="openAddTaskModal()"
         class="hover:bg-red-500 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mr-3">

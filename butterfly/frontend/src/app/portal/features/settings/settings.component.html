@@ -1,1 +1,146 @@
-<p>settings works!</p>
+<div class="max-w-lg mx-auto p-6 bg-[#212121] rounded-lg shadow-md">
+  <h2 class="text-2xl font-semibold text-center mb-6 text-white">
+    Update User Settings
+  </h2>
+
+  <form (ngSubmit)="onSubmit()" #userSettingsForm="ngForm">
+    <div
+      *ngIf="errorMessage"
+      class="text-red-600 font-bold text-center bg-red-200"
+    >
+      <p class="p-2">{{ errorMessage }}</p>
+    </div>
+
+    <div class="mb-4">
+      <label for="firstName" class="block text-sm font-medium text-white mb-2"
+        >First Name</label
+      >
+      <input
+        type="text"
+        id="firstName"
+        name="firstName"
+        [(ngModel)]="firstName"
+        #firstNameInput="ngModel"
+        required
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter your first name"
+      />
+      <div
+        *ngIf="firstNameInput.invalid && firstNameInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        First Name is required.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="lastName" class="block text-sm font-medium text-white mb-2"
+        >Last Name</label
+      >
+      <input
+        type="text"
+        id="lastName"
+        name="lastName"
+        [(ngModel)]="lastName"
+        #lastNameInput="ngModel"
+        required
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter your last name"
+      />
+      <div
+        *ngIf="lastNameInput.invalid && lastNameInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        Last Name is required.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="email" class="block text-sm font-medium text-white mb-2"
+        >Email</label
+      >
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="email"
+        #emailInput="ngModel"
+        required
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter your email"
+      />
+      <div
+        *ngIf="emailInput.invalid && emailInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        Please enter a valid email address.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="password" class="block text-sm font-medium text-white mb-2"
+        >Password</label
+      >
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="password"
+        #passwordInput="ngModel"
+        required
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Enter your password"
+      />
+      <div
+        *ngIf="passwordInput.invalid && passwordInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        Password is required.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label
+        for="confirmPassword"
+        class="block text-sm font-medium text-white mb-2"
+        >Confirm Password</label
+      >
+      <input
+        type="password"
+        id="confirmPassword"
+        name="confirmPassword"
+        [(ngModel)]="confirmPassword"
+        #confirmPasswordInput="ngModel"
+        required
+        [ngClass]="{
+          'border-red-500':
+            confirmPasswordInput.invalid && confirmPasswordInput.touched
+        }"
+        class="w-full p-3 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Confirm your password"
+      />
+      <div
+        *ngIf="confirmPasswordInput.invalid && confirmPasswordInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        Confirm Password is required.
+      </div>
+      <div
+        *ngIf="password !== confirmPassword && confirmPasswordInput.touched"
+        class="text-sm text-red-600 mt-2"
+      >
+        Passwords do not match.
+      </div>
+    </div>
+
+    <div class="flex justify-center">
+      <button
+        type="submit"
+        [disabled]="userSettingsForm.invalid || isSubmitting"
+        class="w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-md hover:bg-blue-600 focus:outline-none disabled:bg-gray-400"
+      >
+        Update Settings
+      </button>
+    </div>
+  </form>
+</div>

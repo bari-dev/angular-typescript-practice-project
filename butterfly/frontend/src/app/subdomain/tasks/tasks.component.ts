@@ -59,6 +59,7 @@ export class TasksComponent implements OnInit {
   displayedColumns: string[] = ['sn', 'title', 'due-date', 'status', 'actions'];
   dataSource = new MatTableDataSource<TaskInterface>();
   tasklistId: string = '';
+  isActionAllow: boolean = false;
 
   @ViewChild(MatSort) sort: MatSort | null = null;
 
@@ -76,9 +77,15 @@ export class TasksComponent implements OnInit {
     }
     this.tasklist = this._subdomainAuthService.getTasklist();
     this.tasklistId = this.tasklist.id
+    this.isActionAllow = this._subdomainAuthService.isAllow('tasklist', 'update');
+    this.fetchTasksAndTasklist();
   }
   
   ngOnInit(): void {
+    this.fetchTasksAndTasklist();  
+  }
+
+  fetchTasksAndTasklist(): void {
     this.activatedRoute.queryParams.subscribe(async (params) => {
       const filter = params['filter'];
   
@@ -93,7 +100,7 @@ export class TasksComponent implements OnInit {
         console.error('Error fetching tasklist or tasks:', error);
       }
     });
-  }  
+  }
   
   announceSortChange(sortState: Sort) {
     if (sortState.direction) {

@@ -68,4 +68,10 @@ export class SubdomainAuthService {
 
     return null;
   }
+
+  isAllow(object: string, action: string): boolean {
+    object
+    action
+    return false;
+  }
 }
