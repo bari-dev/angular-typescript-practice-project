@@ -14,15 +14,24 @@ import subdomainAuth from './middleware/subdomainAuthTasklist';
 import Task from './models/task';
 import TasklistMember from './models/tasklistMembers';
 import TaskUser from './models/taskuser';
+import Notification from './models/notification';
+import { Server } from 'socket.io';
+import http from 'http';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['*'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.json());
 
+// Sequelize connection and model association
 sequelizeConnection.authenticate().then(() => {
   TaskList.associate();
   User.associate();
@@ -31,17 +40,65 @@ sequelizeConnection.authenticate().then(() => {
   TaskUser.associate();
 });
 
-// basic api path
-const path = '/api/v1'
+// Create an HTTP server for both Express and socket.io
+const server = http.createServer(app);
+const socketIo = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+  transports: ['websocket', 'polling']
+});
+
+// Socket.IO logic: Handle connections and notifications
+socketIo.on('connection', (socket) => {
+  const userId = socket.handshake.query?.userId;
+  console.log(`User connected with ID: ${userId}`);
+
+  if (!userId) {
+    console.error('No userId passed');
+    return;
+  }
+
+  socket.on('sendNotification', async (notificationData) => {
+    const notification = await Notification.create({
+      userId,
+      title: notificationData.title,
+      description: notificationData.description,
+      type: notificationData.type || 'info',
+    });
+
+    socketIo.to(userId).emit('notification', {
+      ...notificationData,
+      userId,
+      id: notification.id,
+      read: false,
+    });
+  });
+
+  setTimeout(() => {
+    socketIo.to(userId).emit('notification', {
+      title: "Task Assigned",
+      description: "You have been added to a new tasklist!",
+      type: "info",
+      id: "task-1234",
+      read: false,
+      userId: userId,
+    });
+  }, 2000);
+
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${userId}`);
+  });
+});
 
 // Routes
-app.use(`${path}/auth`, authRoutes);
-app.use(`${path}/subdomainAuth`, subdomainAuthRoutes);
-app.use(`${path}/users`, authenticateUser, userRoutes);
-app.use(`${path}/tasklists`, subdomainAuth, tasklistRoutes);
-app.use(`${path}/force`, authenticateUser, forceRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/subdomainAuth', subdomainAuthRoutes);
+app.use('/api/v1/users', authenticateUser, userRoutes);
+app.use('/api/v1/tasklists', subdomainAuth, tasklistRoutes);
+app.use('/api/v1/force', authenticateUser, forceRoutes);
 
-// Server
-app.listen(port, () => {
+// Start the server (Express + Socket.io)
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

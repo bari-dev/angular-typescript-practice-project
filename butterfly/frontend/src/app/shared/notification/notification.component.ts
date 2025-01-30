@@ -31,7 +31,10 @@ import { NgForOf } from '@angular/common';
                  'opacity-50': notification.read
                }"
                (click)="markAsRead(notification.id)">
-            <p class="text-[15px]">{{ notification.message }}</p>
+            <div class="text-[15px]">
+              <div>{{ notification.title }}</div>
+              <div>{{ notification.description }}</div>
+            </div>
           </div>
         </div>
         <div class="p-2 text-center text-[15px]">
@@ -51,7 +54,7 @@ export class NotificationComponent {
 
   constructor(private notificationService: NotificationService) {
     this.notificationService.notifications$.subscribe((notifications: any) => {
-      this.unreadCount = notifications.filter((n: any) => !n.read).length;
+      this.unreadCount = notifications.filter((notification: any) => !notification.read).length;
     });
   }
 
@@ -61,10 +64,6 @@ export class NotificationComponent {
 
   closeModal() {
     this.isModalOpen = false;
-  }
-
-  removeNotification(id: string) {
-    this.notificationService.removeNotification(id);
   }
 
   markAsRead(id: string) {

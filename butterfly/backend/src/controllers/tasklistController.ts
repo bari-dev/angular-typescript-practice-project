@@ -6,6 +6,7 @@ import { QueryTypes } from 'sequelize';
 import tasklistService from '../services/tasklist.service';
 import User from '../models/user';
 import Joi from 'joi';
+import NotificationService from '../services/notification.service';
 
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
@@ -202,6 +203,7 @@ class TaskListController {
         return;
       }
 
+      NotificationService.createNotificationForTasklist(tasklist, currentUser, user);
       res.status(200).json({ message: 'User added to task list successfully.', taskListMembers });
       return;
     } catch (err) {

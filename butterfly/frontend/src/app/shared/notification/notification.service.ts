@@ -1,45 +1,74 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-
-interface Notification {
-  message: string;
-  type: 'success' | 'error' | 'info';
-  id: string;
-  read: boolean;  // Track if the notification is read
-}
+import { HttpClient } from '@angular/common/http';
+import { NotificationInterface } from '../../core/interfaces/notification.interface';
+import { SocketService } from '../../core/services/socket.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotificationService {
-  private notificationsSubject = new BehaviorSubject<Notification[]>( [
-    { message: 'Notification 1', type: 'success', id: '1', read: false },
-    { message: 'Notification 2', type: 'error', id: '2', read: false },
-    { message: 'Notification 3', type: 'info', id: '3', read: false },
-    { message: 'Notification 3', type: 'info', id: '4', read: false },
-    { message: 'Notification 3', type: 'info', id: '6', read: false },
-    { message: 'Notification 3', type: 'info', id: '7', read: false },
-    { message: 'Notification 3', type: 'info', id: '8', read: false },
-    { message: 'Notification 3', type: 'info', id: '9', read: false },
-    { message: 'Notification 3', type: 'info', id: '10', read: false },
-  ]);
+  private socket = this.socketService.getSocket();
+  private notificationsSubject = new BehaviorSubject<NotificationInterface[]>(
+    []
+  );
   notifications$ = this.notificationsSubject.asObservable();
 
-  addNotification(message: string, type: 'success' | 'error' | 'info') {
-    const id = Math.random().toString(36).substr(2, 9);
-    const notification: Notification = { message, type, id, read: false };
-    this.notificationsSubject.next([...this.notificationsSubject.value, notification]);
+  constructor(
+    private socketService: SocketService,
+    private http: HttpClient,
+    private authService: AuthService
+  ) {
+    this.fetchNotifications();
+    this.listenForNotifications();
   }
 
-  removeNotification(id: string) {
-    this.notificationsSubject.next(
-      this.notificationsSubject.value.filter(notification => notification.id !== id)
-    );
+  fetchNotifications() {
+    const userId = this.authService.getUser()?.id;
+
+    if (userId) {
+      this.http
+        .get<{ notifications: NotificationInterface[] }>(
+          `http://localhost:3000/api/v1/users/${userId}/notifications`
+        )
+        .subscribe(
+          (response) => {
+            const notifications = response.notifications;
+            if (Array.isArray(notifications)) {
+              this.notificationsSubject.next(notifications);
+            } else {
+              console.error(
+                'API returned an invalid notifications array:',
+                notifications
+              );
+            }
+          },
+          (error) => {
+            console.error('Error fetching notifications:', error);
+          }
+        );
+    }
   }
 
+  private listenForNotifications() {
+    this.socket?.on('notification', (notification: NotificationInterface) => {
+      this.addNotification(notification);
+    });
+  }
+
+  addNotification(notification: NotificationInterface) {
+    this.notificationsSubject.next([
+      ...this.notificationsSubject.value,
+      notification,
+    ]);
+  }
+
+  // Mark a notification as read
   markAsRead(id: string) {
-    const updatedNotifications = this.notificationsSubject.value.map(notification =>
-      notification.id === id ? { ...notification, read: true } : notification
+    const updatedNotifications = this.notificationsSubject.value.map(
+      (notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
     );
     this.notificationsSubject.next(updatedNotifications);
   }
