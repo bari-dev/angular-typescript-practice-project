@@ -34,6 +34,7 @@ export class AddTaskComponent implements OnInit {
   isSubmitting: boolean = false;
   currentDate: string;
   tasklistSlug?: string;
+  btnText?: string = 'Create Task';
 
   constructor(
     private _subdomainAuthService: SubdomainAuthService,
@@ -55,7 +56,8 @@ export class AddTaskComponent implements OnInit {
       this.taskTitle = this.task.title;
       this.taskDescription = this.task.description;
       this.taskCompleted = this.task.completed;
-      this.taskDeadline = this.task.deadline.slice(0, 16);      
+      this.taskDeadline = this.task.deadline.slice(0, 16);
+      this.btnText = 'Update Task';
     }
   }
 
@@ -71,11 +73,11 @@ export class AddTaskComponent implements OnInit {
       return;
     }
 
-    if (this.taskDeadline <= this.currentDate) {
-      this.errorMessage = 'Please ensure the deadline is a future date.';
-      this.isSubmitting = false;
-      return;
-    }
+    // if (this.taskDeadline < this.currentDate) {
+    //   this.errorMessage = 'Please ensure the deadline is a future date.';
+    //   this.isSubmitting = false;
+    //   return;
+    // }
 
     const newTask: any = {
       title: this.taskTitle,
@@ -87,8 +89,9 @@ export class AddTaskComponent implements OnInit {
     };
 
     try {
+      debugger;
       if (this.task) {
-        await this.taskService.updateTask(newTask, this.task.id, this._subdomainAuthService.getTasklist().slug);
+        this.task = await this.taskService.updateTask(newTask, this.task.id, this._subdomainAuthService.getTasklist().slug);
       } else {
         this.task = await this.taskService.createTask(newTask);
       }

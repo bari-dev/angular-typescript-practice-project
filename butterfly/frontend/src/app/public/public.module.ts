@@ -34,7 +34,8 @@ import { PortalModule } from '../portal/portal.module';
     MatButtonModule,
     MatMenuModule,
     AuthModule,
-    PortalModule
+    PortalModule,
+    MatIconModule
   ]
 })
 export class PublicModule { }

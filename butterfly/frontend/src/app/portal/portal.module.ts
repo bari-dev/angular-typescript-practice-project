@@ -19,6 +19,7 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SalaeforceComponent } from './features/salaeforce/salaeforce.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { FormsModule } from '@angular/forms';
+import { NotificationComponent } from '../shared/notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { FormsModule } from '@angular/forms';
     MatListModule,
     MatDividerModule,
     MatCardModule,
-    FormsModule
+    FormsModule,
+    NotificationComponent
   ]
 })
 export class PortalModule { }
