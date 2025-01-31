@@ -235,6 +235,10 @@ class TaskListService {
       ],
     });
   }
+
+  async getAllUserCountByUser(userId: number) {
+    return TaskList.count({ where: { creatorId: userId } });
+  }
 }
 
 export default new TaskListService();

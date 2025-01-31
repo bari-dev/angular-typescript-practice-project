@@ -74,7 +74,6 @@ class TaskListController {
       res.status(500).json({ message: String(err) });
     }
   }
-  
 
   async getTaskListById(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
@@ -158,7 +157,6 @@ class TaskListController {
       return;
     }
   }
-
 
   async addUserToTasklist(req: Request, res: Response): Promise<void> {
     const loginSchema = Joi.object({

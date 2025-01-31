@@ -73,11 +73,11 @@ export class AddTaskComponent implements OnInit {
       return;
     }
 
-    // if (this.taskDeadline < this.currentDate) {
-    //   this.errorMessage = 'Please ensure the deadline is a future date.';
-    //   this.isSubmitting = false;
-    //   return;
-    // }
+    if (this.taskDeadline < this.currentDate) {
+      this.errorMessage = 'Please ensure the deadline is a future date.';
+      this.isSubmitting = false;
+      return;
+    }
 
     const newTask: any = {
       title: this.taskTitle,

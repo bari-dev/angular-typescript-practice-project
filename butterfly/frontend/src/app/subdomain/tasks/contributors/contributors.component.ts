@@ -34,7 +34,6 @@ export class ContributorsComponent implements OnChanges {
   }
 
   closeDialog(): void {
-    this.tasklistMembers = [];
     this.showModal = false;
   }
 

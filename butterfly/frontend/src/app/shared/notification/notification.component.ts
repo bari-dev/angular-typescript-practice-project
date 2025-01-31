@@ -3,6 +3,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from './notification.service';
 import { NgForOf } from '@angular/common';
+import { Observable } from 'rxjs';
+import { map, defaultIfEmpty } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notification',
@@ -12,9 +14,14 @@ import { NgForOf } from '@angular/common';
     <span class="relative">
       <button mat-icon-button class="relative flex justify-center items-center" (click)="toggleModal()" aria-label="Notifications">
         <mat-icon>notifications</mat-icon>
-        <span *ngIf="unreadCount > 0" class="absolute top-[-10px] right-[-10px] bg-red-500 text-white rounded-full text-xs px-2 py-1">
-          {{ unreadCount }}
-        </span>  
+        
+        <!-- Safely check unreadCount$ -->
+        <span *ngIf="unreadCount$ | async as unreadCount">
+          <span *ngIf="unreadCount > 0" 
+            class="absolute top-[-10px] right-[-10px] bg-red-500 text-white rounded-full text-xs px-2 py-1">
+            {{ (unreadCount$ | async) }}
+          </span>
+        </span>
       </button>
 
       <div *ngIf="isModalOpen" class="absolute right-0 mt-2 w-80 bg-[#313131] shadow-lg rounded-lg overflow-hidden z-50">
@@ -50,13 +57,17 @@ import { NgForOf } from '@angular/common';
 export class NotificationComponent {
   notifications$ = this.notificationService.notifications$;
   isModalOpen = false;
-  unreadCount = 0;
 
-  constructor(private notificationService: NotificationService) {
-    this.notificationService.notifications$.subscribe((notifications: any) => {
-      this.unreadCount = notifications.filter((notification: any) => !notification.read).length;
-    });
-  }
+  // Create an observable to track unread count with a default value of 0
+  unreadCount$: Observable<number> = this.notifications$.pipe(
+    map((notifications: any[]) => {
+      // If notifications is empty or null, we return 0 as unread count
+      return notifications ? notifications.filter(notification => !notification.read).length : 0;
+    }),
+    defaultIfEmpty(0) // Ensures that the observable defaults to 0 if no notifications are present
+  );
+
+  constructor(private notificationService: NotificationService) {}
 
   toggleModal() {
     this.isModalOpen = !this.isModalOpen;

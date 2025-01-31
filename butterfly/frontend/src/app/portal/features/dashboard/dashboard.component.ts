@@ -7,7 +7,12 @@ import { UserService } from '../../../core/services/user.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
+  userStats: any;
+
   constructor(private userService: UserService){
-    this.userService.getProfile();
+    this.userService.getUserStats().subscribe((res: any) => {
+        this.userStats = res
+      }
+    )
   }
 }

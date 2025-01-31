@@ -30,6 +30,9 @@ class NotificationService {
     })
   }
 
+  async markAllAsRead(userId: number) {
+    await Notification.update({ read: true }, { where: { userId } });
+  }
 
   private async createNotification(obj: any) {
     await Notification.create(obj);

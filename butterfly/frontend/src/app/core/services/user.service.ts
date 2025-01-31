@@ -30,4 +30,10 @@ export class UserService {
     const headers = this.getAuthHeaders();
     return this.http.get<any[]>(`${this.apiUrl}/profile`, { headers });
   }
+
+  getUserStats(): Observable<any[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any[]>(`${this.apiUrl}/stats`, { headers });
+  }
+
 }

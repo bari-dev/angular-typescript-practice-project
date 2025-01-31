@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import User from "../models/user";
 import Notification from "../models/notification";
+import TasklistService from "../services/tasklist.service";
+import TaskService from "../services/task.service";
 
 export const getAllUsersController: any = async (
   req: Request,
@@ -13,6 +15,18 @@ export const getAllUsersController: any = async (
     throw err;
   }
 };
+
+
+export const getUserStats: any = async (req: Request, res: Response) => {
+  try {
+    const totalTasks        = await TaskService.getTasksCountByUser(Number(req.user?.id)) || 0
+    const totalTasklists    = await TasklistService.getTaskListCount(Number(req.user?.id)) || 0
+    const totalContributors = await TasklistService.getAllUserCountByUser(Number(req.user?.id)) || 0
+    res.json({ totalTasks, totalTasklists, totalContributors });
+  } catch (err) {
+    throw err;
+  }
+}
 
 export const getCurrentUserProfile: any = async (
   req: Request,

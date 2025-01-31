@@ -6,9 +6,8 @@
         <i class="icofont icofont-pie-chart text-blue-500 bg-blue-100 rounded-full p-2 text-xl mt-[6px]"></i>
         <div class="ml-4">
           <span class="text-blue-500 font-semibold text-1xl">Tasklist</span>
-          <h4 class="text-lg font-bold">total 23</h4>
+          <h4 class="text-lg font-bold">total {{ userStats?.totalTasklists ?? 0 }}</h4>
           <div class="mt-2 text-gray-500 text-sm flex items-center">
-            <i class="icofont icofont-warning text-blue-500 mr-2"></i>
             Total Tasklist
           </div>
         </div>
@@ -21,9 +20,8 @@
       <i class="icofont icofont-ui-home text-pink-500 bg-pink-100 rounded-full p-2 text-xl mt-[6px]"></i>
       <div class="ml-4">
         <span class="text-pink-500 font-semibold text-1xl">Task</span>
-        <h4 class="text-xl font-bold">total 24</h4>
+        <h4 class="text-xl font-bold">total {{ userStats?.totalTasks ?? 0 }}</h4>
         <div class="mt-2 text-gray-500 text-sm flex items-center">
-          <i class="icofont icofont-calendar text-pink-500 mr-2"></i>
           Total Task
         </div>
       </div>
@@ -34,10 +32,10 @@
     <div class="flex items-start">
       <i class="icofont icofont-warning-alt text-green-500 bg-green-100 rounded-full p-2 text-xl mt-[6px]"></i>
       <div class="ml-4">
-        <span class="text-green-500 font-semibold text-1xl">Incompleted Tasks</span>
-        <h4 class="text-xl font-bold">total 45</h4>
+        <span class="text-green-500 font-semibold text-1xl">Contributors</span>
+        <h4 class="text-xl font-bold">total {{ userStats?.totalContributors ?? 0 }}</h4>
         <div class="mt-2 text-gray-500 text-sm flex items-center">
-          <i class="icofont icofont-tag text-green-500 mr-2"></i>Total Incompleted Tasks
+          Total Contributors of All Tasklist
         </div>
       </div>
     </div>
