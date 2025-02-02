@@ -2,32 +2,48 @@ import TaskInterface from "../interfaces/task";
 import TasklistInterface from "../interfaces/tasklist";
 import UserInterface from "../interfaces/user";
 import Notification from "../models/notification";
+import { socketIo } from "../server";
 
 class NotificationService {
-  async markAsRead(notificationId: number) {
-    await Notification.update({ read: true }, { where: { id: notificationId } });
+  async markAsRead(notificationId: number, userId: number) {
+    await Notification.update({ read: true }, { where: { id: notificationId, userId } });
   }
 
-  createNotificationForTasklist(tasklist: TasklistInterface | null, fromUser: UserInterface | undefined, toUser: UserInterface) {
-    if(!tasklist || !fromUser) return
+  async createNotificationForTasklist(tasklist: TasklistInterface | null, fromUser: UserInterface | undefined, toUser: UserInterface) {
+    if (!tasklist || !fromUser) return;
 
-    this.createNotification({
+    const notificationData = {
       userId: toUser.id,
       title: 'Tasklist Assigned',
-      description: `${fromUser?.firstName} ${fromUser?.lastName} add you to the tasklist: ${tasklist?.name}`,
+      description: `${fromUser.firstName} ${fromUser.lastName} added you to the tasklist: ${tasklist.name}`,
       type: 'info',
       read: false,
-    })
+    };
+
+    const notification = await this.createNotification(notificationData);
+
+    socketIo.to(`userId:${toUser.id}`).emit('notification', {
+      ...notificationData,
+      id: notification.id
+    });
   }
 
-  createNotificationForTask(task: TaskInterface, fromUser: UserInterface, toUser: UserInterface) {
-    this.createNotification({
+  async createNotificationForTask(task: TaskInterface, fromUser: UserInterface, toUser: UserInterface) {
+    const notificationData = {
       userId: toUser.id,
       title: 'Task Assigned',
-      description: `${fromUser.firstName} ${fromUser.lastName} add you to the task: ${task.title}`,
+      description: `${fromUser.firstName} ${fromUser.lastName} added you to the task: ${task.title}`,
       type: 'info',
       read: false,
-    })
+    };
+
+    const notification = await this.createNotification(notificationData);
+
+    // Emit the notification to the specific user
+    socketIo.to('notification').emit('notification', {
+      ...notificationData,
+      id: notification.id // Ensure the notification id is sent
+    });
   }
 
   async markAllAsRead(userId: number) {
@@ -35,7 +51,8 @@ class NotificationService {
   }
 
   private async createNotification(obj: any) {
-    await Notification.create(obj);
+    const notification = await Notification.create(obj);
+    return notification;
   }
 }
 

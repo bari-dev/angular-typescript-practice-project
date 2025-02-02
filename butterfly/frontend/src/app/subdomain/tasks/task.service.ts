@@ -31,4 +31,8 @@ export class TaskService {
   async toggleStatus(tasklistSlug: string, taskId: number): Promise<TaskInterface> {
     return await this._clientApi.toggleTaskStatus(tasklistSlug, taskId);
   }
+
+  async deleteTask(tasklistSlug: string, taskId: number): Promise<boolean> {
+    return await this._clientApi.deleteTask(tasklistSlug, taskId);
+  }
 }

@@ -2,6 +2,9 @@ import { Component, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { SubdomainAuthService } from '../../../core/services/subdomain-auth.service';
+import { TasklistService } from '../../../core/services/tasklist.service';
+import { ButterflyClientApi } from '../../../core/api/ClientApi';
+import UserInterface from '../../../core/interfaces/models/user.interface';
 
 @Component({
   selector: 'app-contributors',
@@ -19,11 +22,15 @@ export class ContributorsComponent implements OnChanges {
   tasklistMembers: any[] = [];
   showModal: boolean = false;
   isCreator: boolean = false;
+  curretnUser: UserInterface | null = null;
+  tasklistCreatorId?: number;
 
-  constructor(private _subdomainAuthService: SubdomainAuthService) {}
+  constructor(private _subdomainAuthService: SubdomainAuthService, private butterflyClientApi: ButterflyClientApi) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tasklist'] && this.tasklist) {
+      this.tasklistCreatorId = this.tasklist.creatorId;
+      this.curretnUser = this._subdomainAuthService.getUser();
       this.isCreator = this._subdomainAuthService.getUser()?.id === this.tasklist.creatorId;
       this.tasklistMembers = this.tasklist.users || [];
     }
@@ -37,7 +44,11 @@ export class ContributorsComponent implements OnChanges {
     this.showModal = false;
   }
 
-  removeMember(member: any): void {
-    // You can implement the removeMember logic here if required
+  removeContributor(contributor: any): void {
+    this.butterflyClientApi.removeContributor(this.tasklist.slug, contributor?.TasklistMember?.memberId).then(() => {
+      this.tasklistMembers = this.tasklistMembers.filter(member => member.id !== contributor.id)
+    }).catch((error) => {
+      console.error('Error removing contributor:', error);
+    })
   }
 }

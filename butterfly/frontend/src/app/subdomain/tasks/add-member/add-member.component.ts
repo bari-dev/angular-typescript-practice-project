@@ -83,11 +83,6 @@ export class AddMemberComponent implements OnChanges {
       });
   }
 
-  removeContributor(contributor: any): void {
-    this.contributors = this.contributors.filter(contrib => contrib !== contributor);
-    this.emitTaskUpdate();
-  }
-
   private emitTaskUpdate(): void {
     const tasklist = { ...this.tasklist, users: this.contributors };
     this.updateTasklist.emit(tasklist);

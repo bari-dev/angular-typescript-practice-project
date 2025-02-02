@@ -42,49 +42,22 @@ sequelizeConnection.authenticate().then(() => {
 
 // Create an HTTP server for both Express and socket.io
 const server = http.createServer(app);
-const socketIo = new Server(server, {
+export const socketIo = new Server(server, {
   cors: {
     origin: '*',
   },
   transports: ['websocket', 'polling']
 });
 
-// Socket.IO logic: Handle connections and notifications
 socketIo.on('connection', (socket) => {
   const userId = socket.handshake.query?.userId;
   console.log(`User connected with ID: ${userId}`);
 
   if (!userId) {
     console.error('No userId passed');
+    socket.disconnect();
     return;
   }
-
-  socket.on('sendNotification', async (notificationData) => {
-    const notification = await Notification.create({
-      userId,
-      title: notificationData.title,
-      description: notificationData.description,
-      type: notificationData.type || 'info',
-    });
-
-    socketIo.to(userId).emit('notification', {
-      ...notificationData,
-      userId,
-      id: notification.id,
-      read: false,
-    });
-  });
-
-  setTimeout(() => {
-    socketIo.to(userId).emit('notification', {
-      title: "Task Assigned",
-      description: "You have been added to a new tasklist!",
-      type: "info",
-      id: "task-1234",
-      read: false,
-      userId: userId,
-    });
-  }, 2000);
 
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${userId}`);

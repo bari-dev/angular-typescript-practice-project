@@ -12,7 +12,6 @@ declare global {
 
 const subdomainTasklistMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const { taskListSlug } = req.params;
-  console.log(taskListSlug)
   try {
     const taskList = await tasklistService.findTaskListBySlug(taskListSlug)
     if (!taskList) {

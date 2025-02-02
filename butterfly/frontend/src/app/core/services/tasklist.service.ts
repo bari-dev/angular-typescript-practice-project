@@ -53,4 +53,9 @@ export class TasklistService {
     console.log('headers', headers);
     return this.http.get<TasklistInterface>(`${this.apiUrl}/${id}`, { headers });
   }
+
+  removeContributor(taskListSlug: string, userId: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete<any>(`${this.apiUrl}/${taskListSlug}/removeUser?userId=${userId}`, { headers });
+  }
 }

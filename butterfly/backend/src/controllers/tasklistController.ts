@@ -77,7 +77,6 @@ class TaskListController {
 
   async getTaskListById(req: Request, res: Response): Promise<void> {
     const { taskListId } = req.params;
-    console.log(taskListId);
     try {
       const taskList = await TaskListService.getTaskListById(Number(taskListId));
       res.status(200).json(taskList);
@@ -184,7 +183,7 @@ class TaskListController {
 
       if(tasklist?.creatorId !== currentUser?.id) {
         res.status(400).json({ message: 'You are not the creator of this task.' });
-        return 
+        return
       }
 
       const user = await User.findOne({where: { email: userEmail }})
@@ -203,6 +202,39 @@ class TaskListController {
 
       NotificationService.createNotificationForTasklist(tasklist, currentUser, user);
       res.status(200).json({ message: 'User added to task list successfully.', taskListMembers });
+      return;
+    } catch (err) {
+      res.status(500).json({ message: String(err) });
+      return;
+    }
+  }
+
+  async removeUserFromTasklist(req: Request, res: Response): Promise<void> {
+    const tasklistSlug = req.params.taskListSlug;
+    const userId = req.query.userId;
+    const currentUser = req.user;
+  
+    try {
+      const tasklist = await tasklistService.findTaskListBySlug(tasklistSlug);
+  
+      if (!tasklist) {
+        res.status(404).json({ message: 'Tasklist not found' });
+        return;
+      }
+  
+      if (tasklist.creatorId !== currentUser?.id) {
+        res.status(400).json({ message: 'You are not the creator of this task.' });
+        return;
+      }
+  
+      const taskListMembers = await TaskListService.removeUserFromTasklist(Number(userId), Number(tasklist.id));
+  
+      if (!taskListMembers) {
+        res.status(404).json({ message: 'Tasklist not found or user could not be removed.' });
+        return;
+      }
+  
+      res.status(200).json({ message: 'User removed from task list successfully.', taskListMembers });
       return;
     } catch (err) {
       res.status(500).json({ message: String(err) });

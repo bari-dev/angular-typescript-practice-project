@@ -80,4 +80,24 @@ export class ButterflyClientApi {
       throw error;
     }
   }
+
+  async removeContributor(tasklistId: string, userId: string): Promise<any> {
+    try {
+      const response = await this.axiosInstance.delete(`/tasklists/${tasklistId}/removeUser?userId=${userId}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error removing contributor:", error);
+      throw error;
+    }
+  }
+
+  async deleteTask(tasklistSlug: string, taskId: number): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.delete(`/tasklists/${tasklistSlug}/tasks/${taskId}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error deleting task:", error);
+      throw error;
+    }
+  }
 }

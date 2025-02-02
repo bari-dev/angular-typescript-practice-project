@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3000'; // Replace with your backend URL
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ const BASE_URL = 'http://localhost:3000';
 export class SocketService {
   private socket?: Socket;
   private userId?: number;
-  private isSocketConnected: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private isSocketConnected: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false); // Track connection status
 
   constructor(private authService: AuthService) {
     this.userId = this.authService.getUser()?.id;

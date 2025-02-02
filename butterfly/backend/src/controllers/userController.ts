@@ -3,6 +3,7 @@ import User from "../models/user";
 import Notification from "../models/notification";
 import TasklistService from "../services/tasklist.service";
 import TaskService from "../services/task.service";
+import notificationService from "../services/notification.service";
 
 export const getAllUsersController: any = async (
   req: Request,
@@ -16,6 +17,23 @@ export const getAllUsersController: any = async (
   }
 };
 
+export const markAsRead: any = async (req: Request, res: Response) => {
+  try {
+    notificationService.markAsRead(Number(req.params.notificationId), Number(req.user?.id));
+    res.json({ message: "Notification marked as read" });
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const markAllAsRead: any = async (req: Request, res: Response) => {
+  try {
+    notificationService.markAllAsRead(Number(req.user?.id));
+    res.json({ message: "All notifications marked as read" });
+  } catch (err) {
+    throw err;
+  }
+}
 
 export const getUserStats: any = async (req: Request, res: Response) => {
   try {
@@ -51,7 +69,7 @@ export const getNotifications: any = async (req: Request, res: Response) => {
   try {
     const reqUser = req.user;
     const notifications = await Notification.findAll({
-      where: { userId: reqUser?.id }});
+      where: { userId: reqUser?.id }, order: [["createdAt", "DESC"]]});
 
       res.json({ notifications });
   } catch (err) {
@@ -86,7 +104,6 @@ export const updateCurrentUser = async (
 
     res.status(200).json({ message: "User updated successfully", user });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Something went wrong", error: err });
   }
 };

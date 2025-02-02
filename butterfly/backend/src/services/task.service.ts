@@ -128,16 +128,24 @@ class TaskService {
     try {
       const tasks = await Task.findAll({
         where: { taskListId: id },
-        order: [["createdAt", "desc"]],
         include: [
           {
             model: User,
             as: "creator",
             attributes: ["id", "firstName", "lastName", "email"],
+          },
+          {
+            model: User,
+            as: "users",
+            attributes: ["id", "firstName", "lastName", "email"],
           }
         ],
+        order: [["createdAt", "desc"]],
         limit: pageSize,
         offset: (page - 1) * pageSize,
+        attributes: {
+          exclude: ["taskListId"]
+        }
       });
       return tasks;
     } catch (error: any) {

@@ -23,13 +23,13 @@ class Task extends Model {
 
     Task.belongsToMany(User, {
       through: TaskUser,
-      foreignKey: "taskId",
-      as: "users"
+      as: "users",
+      foreignKey: "taskId"
     });
 
-    TaskList.hasMany(TaskUser, {
+    Task.hasMany(TaskUser, {
       foreignKey: "taskId",
-      as: "assignedUsers"
+      as: "taskUsers"
     })
   }
 }

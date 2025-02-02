@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NotificationInterface } from '../../core/interfaces/notification.interface';
 import { SocketService } from '../../core/services/socket.service';
 import { AuthService } from '../../core/services/auth.service';
+import { env } from 'src/environments/environment';
+
+const BASE_URL = env.apiBaseUrl;
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
   private socket = this.socketService.getSocket();
-  private notificationsSubject = new BehaviorSubject<NotificationInterface[]>(
-    []
-  );
+  private notificationsSubject = new BehaviorSubject<NotificationInterface[]>([]);
   notifications$ = this.notificationsSubject.asObservable();
 
   constructor(
@@ -30,7 +31,7 @@ export class NotificationService {
     if (userId) {
       this.http
         .get<{ notifications: NotificationInterface[] }>(
-          `http://localhost:3000/api/v1/users/${userId}/notifications`
+          `${BASE_URL}/users/${userId}/notifications`
         )
         .subscribe(
           (response) => {
@@ -38,14 +39,53 @@ export class NotificationService {
             if (Array.isArray(notifications)) {
               this.notificationsSubject.next(notifications);
             } else {
-              console.error(
-                'API returned an invalid notifications array:',
-                notifications
-              );
+              console.error('API returned an invalid notifications array:', notifications);
             }
           },
           (error) => {
             console.error('Error fetching notifications:', error);
+          }
+        );
+    }
+  }
+
+  markAllAsRead() {
+    const userId = this.authService.getUser()?.id;
+
+    if (userId) {
+      this.http
+        .put(`${BASE_URL}/users/${userId}/notifications/markAllRead`, {})
+        .subscribe(
+          () => {
+            const updatedNotifications = this.notificationsSubject.value.map(
+              (notification) => ({ ...notification, read: true })
+            );
+            this.notificationsSubject.next(updatedNotifications);
+          },
+          (error) => {
+            console.error('Error marking all notifications as read:', error);
+          }
+        );
+    }
+  }
+
+  // Mark a single notification as read
+  markRead(id: string) {
+    const userId = this.authService.getUser()?.id;
+
+    if (userId) {
+      this.http
+        .put(`${BASE_URL}/users/${userId}/notifications/${id}/markAsRead`, {})
+        .subscribe(
+          () => {
+            const updatedNotifications = this.notificationsSubject.value.map(
+              (notification) =>
+                notification.id === id ? { ...notification, read: true } : notification
+            );
+            this.notificationsSubject.next(updatedNotifications);
+          },
+          (error) => {
+            console.error('Error marking notification as read:', error);
           }
         );
     }
@@ -57,19 +97,19 @@ export class NotificationService {
     });
   }
 
-  addNotification(notification: NotificationInterface) {
+  private addNotification(notification: NotificationInterface) {
     this.notificationsSubject.next([
       ...this.notificationsSubject.value,
       notification,
     ]);
   }
 
-  // Mark a notification as read
-  markAsRead(id: string) {
-    const updatedNotifications = this.notificationsSubject.value.map(
-      (notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-    );
-    this.notificationsSubject.next(updatedNotifications);
+  private handleSocketErrors() {
+    this.socket?.on('connect_error', (err: any) => {
+      console.error('WebSocket connection error:', err);
+    });
+    this.socket?.on('disconnect', () => {
+      console.warn('WebSocket disconnected');
+    });
   }
 }

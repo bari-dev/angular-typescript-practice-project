@@ -9,6 +9,7 @@ const router = Router();
 router.get('/', tasklistController.getAllTaskLists);
 router.get('/search', tasklistController.getFilterTasklist);
 router.post('/:taskListSlug/addUser', tasklistController.addUserToTasklist);
+router.delete('/:taskListSlug/removeUser', tasklistController.removeUserFromTasklist);
 
 router.get('/:taskListId', tasklistController.getTaskListById);
 router.post('/', tasklistController.createTaskList);

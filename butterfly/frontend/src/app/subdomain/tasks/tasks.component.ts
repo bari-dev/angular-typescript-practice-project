@@ -19,6 +19,8 @@ import { AddUsersComponent } from './add-users/add-users.component';
 import { ContributorsComponent } from './contributors/contributors.component';
 import { AddMemberComponent } from './add-member/add-member.component';
 import { TasklistService } from '../../core/services/tasklist.service';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import UserInterface from '../../core/interfaces/models/user.interface';
 
 @Component({
   selector: 'app-tasks',
@@ -60,6 +62,7 @@ export class TasksComponent implements OnInit {
   dataSource = new MatTableDataSource<TaskInterface>();
   tasklistId: string = '';
   isActionAllow: boolean = false;
+  currentUser: UserInterface | null = null;
 
   @ViewChild(MatSort) sort: MatSort | null = null;
 
@@ -75,9 +78,10 @@ export class TasksComponent implements OnInit {
     if (!this._subdomainAuthService.isAuthenticated()) {
       this.router.navigateByUrl('/');
     }
+    this.currentUser = this._subdomainAuthService.getUser();
     this.tasklist = this._subdomainAuthService.getTasklist();
     this.tasklistId = this.tasklist.id
-    this.isActionAllow = this._subdomainAuthService.isAllow('tasklist', 'update');
+    this.isActionAllow = this.tasklist.creatorId === this._subdomainAuthService.getUser()?.id;
     this.fetchTasksAndTasklist();
   }
   
@@ -147,6 +151,7 @@ export class TasksComponent implements OnInit {
     try {
       const data: any = await this._taskService.getTaskBySearchFilter(this._subdomainAuthService.getTasklist().slug, this.filterOption);
       this.tasks = data.tasks;
+      console.log(this.tasks);
       this.dataSource = new MatTableDataSource(data.tasks);
     } catch (error: any) {
       this.showAlert = true;
@@ -215,4 +220,32 @@ export class TasksComponent implements OnInit {
   async onTasklistUpdate(updatedTasklist: any): Promise<void> {
     await this.fetchTasklist();
   }
+
+  async deleteTask(deletedTask: any): Promise<void> {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        message: `Are you sure you want to delete this ${deletedTask.title} tasklist?`,
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel'
+      }
+    });
+  
+    const result = await dialogRef.afterClosed().toPromise();
+  
+    if (result) {
+      this.loading = true;
+      try {
+        await this._taskService.deleteTask(this.tasklist.slug, deletedTask.id);
+        this.tasks = this.tasks.filter(task => task.id !== Number(deletedTask.id));
+        this.dataSource.data = this.tasks;
+        this.dataSource.filter = '';
+      } catch (error: any) {
+        console.error('Error deleting tasklist:', error);
+        this.showAlert = true;
+        this.alertMessage = error.error?.message || 'An error occurred while deleting the tasklist.';
+      } finally {
+        this.loading = false;
+      }
+    }
+  }  
 }

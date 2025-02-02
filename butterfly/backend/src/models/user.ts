@@ -16,11 +16,6 @@ class User extends Model {
 
   static associate() {
     User.hasMany(TaskList, { foreignKey: "creatorId", as: "tasklists" });
-    User.belongsToMany(Task, {
-      through: TaskUser,
-      foreignKey: "userId",
-      as: "tasks",
-    });
 
     User.belongsToMany(TaskList, {
       through: TasklistMember,
@@ -32,6 +27,12 @@ class User extends Model {
       foreignKey: "memberId",
       as: "tasklistMembers"
     })
+
+    User.belongsToMany(Task, {
+      through: TaskUser,
+      foreignKey: "userId",
+      as: "tasks",
+    });
 
     User.hasMany(TaskUser, {
       foreignKey: "userId",

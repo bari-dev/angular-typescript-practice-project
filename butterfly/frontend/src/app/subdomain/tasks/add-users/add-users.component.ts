@@ -28,8 +28,9 @@ export class AddUsersComponent implements OnChanges {
   constructor(
     private http: HttpClient,
     private _subdomainAuthService: SubdomainAuthService
-  ) {}
-
+  ) {
+  }
+  
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tasklist'] && this.tasklist) {
       this.contributors = this.tasklist.users || [];

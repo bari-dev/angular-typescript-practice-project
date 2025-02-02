@@ -73,7 +73,7 @@ export class AddTaskComponent implements OnInit {
       return;
     }
 
-    if (this.taskDeadline < this.currentDate) {
+    if (this.taskDeadline < this.currentDate && !this.task) {
       this.errorMessage = 'Please ensure the deadline is a future date.';
       this.isSubmitting = false;
       return;
@@ -91,6 +91,7 @@ export class AddTaskComponent implements OnInit {
     try {
       if (this.task) {
         this.task = await this.taskService.updateTask(newTask, this.task.id, this._subdomainAuthService.getTasklist().slug);
+        this.emitTaskUpdate();
       } else {
         this.task = await this.taskService.createTask(newTask);
       }
@@ -102,6 +103,10 @@ export class AddTaskComponent implements OnInit {
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  emitTaskUpdate(): void {
+    this.taskUpdated.emit();
   }
 
   closeDialog(): void {

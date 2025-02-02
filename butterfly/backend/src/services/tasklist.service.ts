@@ -73,7 +73,6 @@ class TaskListService {
           }
         ],
       });
-      console.log(taskList);
       if (!taskList) throw new Error("Task list not found");
       return taskList;
     } catch (error) {
@@ -142,26 +141,45 @@ class TaskListService {
         memberId: userId,
       });
 
-      const TasklistMembers = await TasklistMember.findAll({
-        where: {
-          tasklistId: taskListId,
-          memberId: userId
-        },
-        include: [
-          {
-            model: TaskList,
-            as: 'tasklist'
-          },
-          {
-            model: User,
-            as: 'member'
-          }
-        ]
-      });
   
-      return TasklistMembers;
+      return this.getAllTaskListMembers(taskListId, userId);
     } catch (err) {
       throw new Error("Error adding user to task list: " + err);
+    }
+  }
+
+  private async getAllTaskListMembers(taskListId: number, userId: number): Promise<TasklistMember[]> {
+    return await TasklistMember.findAll({
+      where: {
+        tasklistId: taskListId,
+        memberId: userId
+      },
+      include: [
+        {
+          model: TaskList,
+          as: 'tasklist'
+        },
+        {
+          model: User,
+          as: 'member'
+        }
+      ]
+    });
+  }
+
+  async removeUserFromTasklist(userId: number, taskListId: number) {
+    try {
+      const taskListMember = await TasklistMember.findOne({
+        where: {
+          memberId: userId,
+          tasklistId: taskListId
+        }
+      });
+      if (!taskListMember) throw new Error('Tasklist member not found');
+      await taskListMember.destroy();
+      return taskListMember;
+    } catch (error) {
+      throw new Error("Error removing user from task list: " + error);
     }
   }
 
