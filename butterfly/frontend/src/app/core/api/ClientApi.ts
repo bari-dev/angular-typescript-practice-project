@@ -91,6 +91,16 @@ export class ButterflyClientApi {
     }
   }
 
+  async removeTaskMemeber(tasklistSlug: string, taskId: number, userId: string): Promise<any> {
+    try {
+      const response = await this.axiosInstance.delete(`/tasklists/${tasklistSlug}/tasks/${taskId}/removeUser?memberId=${userId}`);
+      return response.data;
+    } catch (error) {
+      console.log("Error removing task member:", error);
+      throw error;
+    }
+  }
+
   async deleteTask(tasklistSlug: string, taskId: number): Promise<boolean> {
     try {
       const response = await this.axiosInstance.delete(`/tasklists/${tasklistSlug}/tasks/${taskId}`);

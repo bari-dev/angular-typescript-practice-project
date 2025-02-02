@@ -82,7 +82,6 @@ export class TasksComponent implements OnInit {
     this.tasklist = this._subdomainAuthService.getTasklist();
     this.tasklistId = this.tasklist.id
     this.isActionAllow = this.tasklist.creatorId === this._subdomainAuthService.getUser()?.id;
-    this.fetchTasksAndTasklist();
   }
   
   ngOnInit(): void {

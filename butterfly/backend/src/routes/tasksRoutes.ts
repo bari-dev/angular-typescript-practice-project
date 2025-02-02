@@ -9,6 +9,7 @@ router.get('/:taskId', tasksController.getTaskById);
 router.put('/:taskId', tasksController.updateTask);
 router.delete('/:taskId', tasksController.deleteTask);
 router.post('/:taskId/addUser', tasksController.addUserToTask);
+router.delete('/:taskId/removeUser', tasksController.removeUserFromTask);
 router.patch('/:taskId/toggleStatus', tasksController.updateStatus);
 
 export default router;

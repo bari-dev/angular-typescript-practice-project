@@ -65,10 +65,8 @@ export class AddUsersComponent implements OnChanges {
       )
       .subscribe((response: any) => {
         this.isLoading = false;
-
         if (response && response.users) {
-          this.contributors = response.users;
-          this.emitTaskUpdate();
+          this.emitTaskUpdate(response.users);
           this.closeModal();
         }
       });
@@ -76,11 +74,11 @@ export class AddUsersComponent implements OnChanges {
 
   removeContributor(contributor: any): void {
     this.contributors = this.contributors.filter(contrib => contrib !== contributor);
-    this.emitTaskUpdate();
+    this.emitTaskUpdate(this.contributors);
   }
 
-  private emitTaskUpdate(): void {
-    const updatedTask = { ...this.tasklist, users: this.contributors };
+  private emitTaskUpdate(users: any): void {
+    const updatedTask = { ...this.task, users };
     this.updateTask.emit(updatedTask);
   }
 
@@ -93,10 +91,5 @@ export class AddUsersComponent implements OnChanges {
     this.newUser = '';
     this.selectedMember = null;
     this.errorMessage = '';
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
   }
 }

@@ -220,6 +220,30 @@ class TaskController {
       return;
     }
   }
+
+  async removeUserFromTask(req: Request, res: Response): Promise<void> {
+    const { memberId } = req.query;
+    const { taskId } = req.params;
+    const tasklist = req.tasklist;
+  
+    try {  
+      let task = await TaskService.getTaskById(Number(taskId));
+      if (!task) {
+        throw new Error("Task not found.");
+      }
+      const taskUser = await TaskService.removeTaskUser(Number(memberId), Number(taskId));  
+      if (!taskUser) {
+        throw new Error("User could not be removed from the task.");
+      }
+      task = await TaskService.getTaskById(Number(taskId));
+      res.status(200).json(task);
+    } catch (err) {
+      res.status(500).json({
+        message: err instanceof Error ? err.message : String(err),
+      });
+      return;
+    }
+  }  
 }
 
 export default new TaskController();

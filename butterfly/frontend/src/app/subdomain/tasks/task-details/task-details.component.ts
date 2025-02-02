@@ -5,6 +5,7 @@ import { SubdomainAuthService } from '../../../core/services/subdomain-auth.serv
 import { TaskService } from '../task.service';
 import { AddUsersComponent } from '../add-users/add-users.component';
 import { TasklistService } from '../../../core/services/tasklist.service';
+import { ButterflyClientApi } from '../../../core/api/ClientApi';
 
 @Component({
   selector: 'app-task-details',
@@ -26,7 +27,7 @@ export class TaskDetailsComponent implements OnChanges {
 
   contributors: any[] = [];
 
-  constructor(private _subdomainAuthService: SubdomainAuthService, private taskService: TaskService, private _tasklistService: TasklistService){
+  constructor(private _subdomainAuthService: SubdomainAuthService, private taskService: TaskService, private _tasklistService: TasklistService, private butterflyClientApi: ButterflyClientApi) {
   }
   
   ngOnChanges(changes: SimpleChanges) {
@@ -59,7 +60,17 @@ export class TaskDetailsComponent implements OnChanges {
     }
   }
 
-  removeContributor(user: any) {
-    this.contributors = this.contributors.filter(contrib => contrib.id !== user.id);
+  addedMember(task: any) {
+    if (task.users) {
+      this.contributors = task.users;
+    }
+  }
+
+  removeContributor(contributor: any): void {
+    this.butterflyClientApi.removeTaskMemeber(this.tasklist.slug, this.task.id, contributor?.id).then(() => {
+      this.contributors = this.contributors.filter(contrib => contrib.id !== contributor.id);
+    }).catch((error) => {
+      console.error('Error removing contributor:', error);
+    })
   }
 }

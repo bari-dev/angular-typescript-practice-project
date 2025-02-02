@@ -143,6 +143,21 @@ class TaskService {
     }
   }
 
+  async removeTaskUser(userId: number, taskId: number) {
+    try {
+      const taskUser = await TaskUser.findOne({
+        where: { userId, taskId },
+      });
+      if (!taskUser) {
+        throw new Error("User not found in task.");
+      }
+      await taskUser.destroy();
+      return taskUser;
+    } catch (error: any) {
+      throw new Error(error as string);
+    }
+  }
+
   async getAllTasks(id: number, page: number, pageSize: number) {
     try {
       const tasks = await Task.findAll({
