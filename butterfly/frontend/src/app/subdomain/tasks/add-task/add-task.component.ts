@@ -91,22 +91,17 @@ export class AddTaskComponent implements OnInit {
     try {
       if (this.task) {
         this.task = await this.taskService.updateTask(newTask, this.task.id, this._subdomainAuthService.getTasklist().slug);
-        this.emitTaskUpdate();
       } else {
         this.task = await this.taskService.createTask(newTask);
       }
 
       this.closeSubmitDialog()
       this.resetFields();
-    } catch (error) {
-      this.errorMessage = 'Error processing task. Please try again later.';
+    } catch (error: any) {
+      this.errorMessage = error?.response.data.message
     } finally {
       this.isSubmitting = false;
     }
-  }
-
-  emitTaskUpdate(): void {
-    this.taskUpdated.emit();
   }
 
   closeDialog(): void {

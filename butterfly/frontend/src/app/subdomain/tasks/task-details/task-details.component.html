@@ -42,7 +42,7 @@
 
   <div class="my-4">
     <h3 class="font-semibold margin--bottom--0">Assign To:</h3>
-    <ul>
+    <ul *ngIf="contributors.length > 0" class="p-2">
       <li *ngFor="let contributor of contributors" class="border border-white w-[40%] p-2 flex justify-between content-center">
         {{ contributor.firstName + ' ' + contributor.lastName }}
         <button

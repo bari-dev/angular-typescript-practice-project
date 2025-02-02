@@ -32,7 +32,7 @@ export class TaskDetailsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['task'] && this.task) {
       this.task = changes['task'].currentValue
-      this.contributors = changes['task'].currentValue.users
+      this.contributors = changes['task'].currentValue?.users ?? []
       this.tasklist = changes['tasklist'].currentValue
       this.isModalOpen.emit(true);
     }

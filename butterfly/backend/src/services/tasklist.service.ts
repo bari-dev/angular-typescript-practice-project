@@ -44,6 +44,7 @@ class TaskListService {
             attributes: ["id", "firstName", "lastName", "email"],
           }
         ],
+        order: [["createdAt", "desc"]],
         offset: (page - 1) * pageSize,
         limit: pageSize,
       });

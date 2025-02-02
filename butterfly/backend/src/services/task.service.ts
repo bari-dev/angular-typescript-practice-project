@@ -36,6 +36,10 @@ class TaskService {
         include: [
           {
             model: User,
+            as: "creator",
+          },
+          {
+            model: User,
             as: "users",
           },
         ],
@@ -88,15 +92,30 @@ class TaskService {
     return task;
   }
 
-  async findTaskBySlugAndTaskList(
-    slug: string,
+  async findTaskByTitleAndTasklist(
+    title: string,
     taskListId: number | undefined
   ): Promise<Task | null> {
     try {
       const task = await Task.findOne({
         where: {
-          slug,
+          title,
           taskListId,
+        },
+      });
+      return task;
+    } catch (err) {
+      throw new Error(("Error checking task slug: " + err) as string);
+    }
+  }
+
+  async findTaskBySlug(
+    slug: string,
+  ): Promise<Task | null> {
+    try {
+      const task = await Task.findOne({
+        where: {
+          slug,
         },
       });
       return task;
@@ -240,7 +259,6 @@ class TaskService {
       ],
     });
   }
-
 
   async getTasksCountByUser(userId: number) {
     return TaskUser.count({ where: { userId } });

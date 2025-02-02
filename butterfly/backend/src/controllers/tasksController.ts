@@ -12,19 +12,27 @@ class TaskController {
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^\w-]+/g, "");
-      let existingTask = await TaskService.findTaskBySlugAndTaskList(
-        taskSlug,
+      let taskWithSameTitle = await TaskService.findTaskByTitleAndTasklist(
+        title,
         req.tasklist?.id
       );
+
+      if (taskWithSameTitle) {
+        throw new Error("Task with same title already exists.");
+      }
+
+      let existingTask = await TaskService.findTaskBySlug(
+        taskSlug,
+      );
+
       while (existingTask) {
         const randomSuffix = Math.floor(10000 + Math.random() * 99999);
         taskSlug = `${taskSlug}-${randomSuffix}`;
-        existingTask = await TaskService.findTaskBySlugAndTaskList(
+        existingTask = await TaskService.findTaskBySlug(
           taskSlug,
-          req.tasklist?.id
         );
       }
-      const task = await TaskService.createTask(
+      let task = await TaskService.createTask(
         title,
         description,
         req.tasklist?.id,
@@ -33,6 +41,9 @@ class TaskController {
         taskSlug,
         req?.user?.id
       );
+
+      task = await TaskService.getTaskById(Number(task.id));
+
       res.status(201).json(task);
       return;
     } catch (err) {
@@ -113,22 +124,45 @@ class TaskController {
   async updateTask(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
     const { title, description, completed, deadline } = req.body.task;
+  
     try {
+      // First, find the task by ID to ensure it exists
+      const task = await TaskService.getTaskById(Number(taskId));
+      if (!task) {
+        res.status(404).json({ message: "Task not found." });
+        return;
+      }
+  
+      // If the title has changed, recalculate the taskSlug
+      let taskSlug = task.slug;
+      if (title !== task.title) {
+        // Check if a task with the new title already exists in the same tasklist
+        let taskWithSameTitle = await TaskService.findTaskByTitleAndTasklist(
+          title,
+          task.taskListId
+        );
+  
+        if (taskWithSameTitle && taskWithSameTitle.id !== task.id) {
+          res.status(400).json({ message: "Task with the same title already exists." });
+          return;
+        }
+      }
+  
+      // Proceed with the task update
       const updatedTask = await TaskService.updateTask(
         Number(taskId),
         title,
         description,
         completed,
-        deadline
+        deadline,
       );
+  
       res.status(200).json(updatedTask);
-      return;
     } catch (err) {
       res.status(500).json({ message: String(err) });
-      return;
     }
   }
-
+  
   async deleteTask(req: Request, res: Response): Promise<void> {
     const { taskId } = req.params;
     try {
