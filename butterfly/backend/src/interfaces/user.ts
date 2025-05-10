@@ -1,8 +1,11 @@
-interface User {
-  id: number;
-  username: string;
+interface UserInterface {
+  id?: number;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export default User;
+export default UserInterface;

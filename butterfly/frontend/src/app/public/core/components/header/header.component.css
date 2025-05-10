@@ -1,0 +1,15 @@
+.blurred-bottom-border::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: inherit;
+  filter: blur(5px);
+  z-index: -1;
+}
+
+.mat-mdc-menu-content {
+  padding: 0;
+}

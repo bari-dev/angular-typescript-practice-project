@@ -1,0 +1,2 @@
+# backend: cd backend && yarn && yarn dev
+# frontend: cd frontend && yarn && ng s

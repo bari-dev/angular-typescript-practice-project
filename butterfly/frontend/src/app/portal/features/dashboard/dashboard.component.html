@@ -1,0 +1,57 @@
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  
+  <mat-card appearance="outlined">
+    <div class="bg-white shadow rounded p-4 card--style">
+      <div class="flex items-start">
+        <i class="icofont icofont-pie-chart text-blue-500 bg-blue-100 rounded-full p-2 text-xl mt-[6px]"></i>
+        <div class="ml-4">
+          <span class="text-blue-500 font-semibold text-1xl">Tasklist</span>
+          <h4 class="text-lg font-bold">total {{ userStats?.totalTasklists ?? 0 }}</h4>
+          <div class="mt-2 text-gray-500 text-sm flex items-center">
+            Total Tasklist
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="bg-white shadow rounded p-4 card--style">
+    <div class="flex items-start">
+      <i class="icofont icofont-ui-home text-pink-500 bg-pink-100 rounded-full p-2 text-xl mt-[6px]"></i>
+      <div class="ml-4">
+        <span class="text-pink-500 font-semibold text-1xl">Task</span>
+        <h4 class="text-xl font-bold">total {{ userStats?.totalTasks ?? 0 }}</h4>
+        <div class="mt-2 text-gray-500 text-sm flex items-center">
+          Total Task
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white shadow rounded p-4 card--style">
+    <div class="flex items-start">
+      <i class="icofont icofont-warning-alt text-green-500 bg-green-100 rounded-full p-2 text-xl mt-[6px]"></i>
+      <div class="ml-4">
+        <span class="text-green-500 font-semibold text-1xl">Contributors</span>
+        <h4 class="text-xl font-bold">total {{ userStats?.totalContributors ?? 0 }}</h4>
+        <div class="mt-2 text-gray-500 text-sm flex items-center">
+          Total Contributors of All Tasklist
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- <div class="bg-white shadow rounded p-4 card--style">
+    <div class="flex items-start">
+      <i class="icofont icofont-social-twitter text-yellow-500 bg-yellow-100 rounded-full p-2 text-xl mt-[6px]"></i>
+      <div class="ml-4">
+        <span class="text-yellow-500 font-semibold text-1xl">Followers</span>
+        <h4 class="text-xl font-bold">+562</h4>
+        <div class="mt-2 text-gray-500 text-sm flex items-center">
+          <i class="icofont icofont-refresh text-yellow-500 mr-2"></i>Just updated
+        </div>
+      </div>
+    </div>
+  </div> -->
+  
+</div>

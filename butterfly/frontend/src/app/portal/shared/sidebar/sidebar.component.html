@@ -1,0 +1,59 @@
+<span class="flex flex-col justify-between align-center items-center gap-5 h-full">
+  <span id="sidebar--content" class="flex flex-col gap-5 justify-start align-start items-start">
+    
+    <!-- User Info Card -->
+    <mat-card appearance="outlined" class="mb-5 rounded-[30px]">
+      <div class="toolbar-tools flex flex-col justify-center align-center">
+        <mat-icon class="text-[60px]">{{ data.user?.icon || 'account_circle' }}</mat-icon>
+        <br />
+        <div>
+          <span class="mat-body-2">{{ data.user?.name }}</span><br />
+          <span class="mat-caption">{{ data.user?.email }}</span>
+        </div>
+      </div>
+    </mat-card>
+    
+    <!-- Sidebar Links -->
+    <span class="flex flex-col gap-1 justify-start align-start items-start p-2">
+      <span mat-list-item routerLink="/dashboard" 
+            class="px-3" 
+            [class.active]="activeTab === 'dashboard'">
+        <mat-list-item class="cursor-pointer flex justify-center align-center items-center gap-[5px]">
+          <mat-icon matListItemIcon>folder</mat-icon>
+          <div matListItemTitle>Dashboard</div>
+        </mat-list-item>
+      </span>
+      <span mat-list-item routerLink="/tasklists" 
+            class="px-3" 
+            [class.active]="activeTab === 'tasklists'">
+        <mat-list-item class="cursor-pointer flex justify-center align-center items-center gap-[5px]">
+          <mat-icon matListItemIcon>list</mat-icon>
+          <div matListItemTitle>TaskLists</div>
+        </mat-list-item>
+      </span>
+      <!-- <span mat-list-item routerLink="/saleforce" 
+            class="px-3" 
+            [class.active]="activeTab === 'saleforce'">
+        <mat-list-item class="cursor-pointer flex justify-center align-center items-center gap-[5px]">
+          <mat-icon matListItemIcon>cloud</mat-icon>
+          <div matListItemTitle>Saleforce</div>
+        </mat-list-item>
+      </span> -->
+      <span mat-list-item routerLink="/settings" 
+            class="px-3" 
+            [class.active]="activeTab === 'settings'">
+        <mat-list-item class="cursor-pointer flex justify-center align-center items-center gap-[5px]">
+          <mat-icon matListItemIcon>settings</mat-icon>
+          <div matListItemTitle>Profile</div>
+        </mat-list-item>
+      </span>
+    </span>
+  </span>
+
+  <!-- Logout Button -->
+  <div (click)="logout()" 
+       class="cursor-pointer bg-red-600 text-white py-2 rounded-md hover:bg-red-800 transition duration-200 w-full flex justify-center items-center align-center gap-2">
+    <mat-icon>exit_to_app</mat-icon>
+    Logout
+  </div>
+</span>

@@ -1,0 +1,26 @@
+.toolbar-tools {
+  display: flex;
+  align-items: center;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.hide-gt-md {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .hide-gt-md {
+    display: inline-flex;
+  }
+}
+
+.warn {
+  color: red;
+}
+
+.primary {
+  color: blue;
+}

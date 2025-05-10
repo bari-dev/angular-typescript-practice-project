@@ -1,0 +1,134 @@
+<header class="bg-[#212121] p-4 shadow-md w-full">
+  <div class="flex items-center justify-between">
+    <div class="text-white text-xl font-semibold">
+      {{ tasklist.name.toUpperCase() }}
+    </div>
+    <span>
+      <app-contributors [tasklist]="tasklist"></app-contributors>
+      <app-add-member *ngIf="isActionAllow" [tasklist]="tasklist" (updateTasklist)="onTasklistUpdate($event)"></app-add-member>
+      <button 
+        (click)="openAddTaskModal()"
+        class="hover:bg-red-500 bg-blue-600 text-white font-semibold py-2 px-4 rounded-md mr-3">
+        Add New Task
+      </button>
+      <button (click)="onLogout()"
+        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md">
+        Logout
+      </button>
+    </span>
+  </div>
+</header>
+
+<div class="flex h-screen bg-[#212121] w-full">
+  <span class="flex flex-col border-2 border-[#212121] rounded-lg"
+    [ngClass]="{'w-[70%] justify-start items-start': isModalOpen, 'w-[100%] mx-4': !isModalOpen}">
+
+    <div class="flex justify-end items-end mb-5 mx-4 w-[97%]">
+      <label for="filter" class="text-lg font-semibold text-white mx-4"
+        >Filter Tasks:</label
+      >
+      <select
+        id="filter"
+        [(ngModel)]="filterOption"
+        (change)="onFilterChange(filterOption)"
+        class="px-4 py-2 pr-4 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      >
+        <option value="all" default>All Tasks</option>
+        <option value="incompleted">Incomplete</option>
+        <option value="completed">Complete</option>
+        <option value="past_due">Past Due</option>
+      </select>
+    </div>
+
+    <span *ngIf="tasks.length > 0; else noTasks" class="flex-1 w-[100%]">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <ng-container matColumnDef="sn" class="w-[2px]">
+          <th mat-header-cell *matHeaderCellDef> Sn# </th>
+          <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+            title
+          </th>
+          <td mat-cell *matCellDef="let element" class="cursor-pointer hover:bg-blue-500" (click)="onTaskClick(element)">
+            <span mat-button>
+              {{ element.title }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="due-date">
+          <th mat-header-cell *matHeaderCellDef sortActionDescription="Sort by weight">
+            Until Due
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <app-countdown 
+              [targetDate]="element.deadline" 
+            ></app-countdown>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+            Status
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <mat-icon *ngIf="element.completed; else notCompleted" class="text-green-500">check</mat-icon>
+            <ng-template #notCompleted>
+              <mat-icon class="text-red-500 border-1 border-red-500">close</mat-icon>
+            </ng-template>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef sortActionDescription="Sort by symbol">
+            Actions
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="slds-dropdown slds-dropdown_right">
+              <ul class="dropdown__list flex" role="menu">
+                <li class="slds-dropdown__item flex cursor-pointer">
+                  <button mat-icon-button (click)="openAddTaskModal(element)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </li>
+                <li class="slds-dropdown__item flex cursor-pointer">
+                  <button
+                    mat-icon-button
+                    (click)="deleteTask(element)"
+                    class="slds-dropdown__item flex cursor-pointer" 
+                    *ngIf="currentUser?.id === element.creatorId || currentUser?.id === tasklist.creatorId"
+                    >
+                    <mat-icon class="mat-icon-size-24" color="warn">delete</mat-icon>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator class='w-full' [length]="tasks.length" [pageSize]="5" [pageSizeOptions]="[5]" aria-label="Select page"></mat-paginator>
+    </span>
+  </span>
+
+  <div [ngClass]="{ 'flex-2': !isModalOpen, 'w-full': isModalOpen }" class="transition-all ease-in-out duration-300">
+    <app-task-details
+      *ngIf="isModalOpen"
+      [task]="selectedTaskDetails"
+      [tasklist]="tasklist"
+      class="w-full"
+      (closeModal)="closeModal()">
+    </app-task-details>
+  </div>
+
+  <ng-template #noTasks>
+    <div class="flex justify-center items-center h-screen flex h-screen bg-[#212121] w-full">
+      <h2 class="text-white text-2xl font-semibold">No Tasks Found</h2>
+    </div>
+  </ng-template>  
+</div>

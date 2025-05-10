@@ -1,0 +1,6 @@
+.background-sky-revert {
+  background-color: rgba(194, 24, 91, 0.87);
+  background: linear-gradient(#0272d4dc, rgba(194, 24, 92, 0.956));
+  background-size: cover;
+  color: #FFFFFF;
+}

@@ -1,0 +1,88 @@
+<div
+  *ngIf="task"
+  class="bg-[#424242] text-white shadow-lg p-4 transition-all duration-300 relative w-full"
+>
+  <h2 class="text-xl font-bold mb-4">Task Details</h2>
+  <div>
+    <p><strong>Title:</strong> {{ task.title }}</p>
+    <p>
+      <strong>Status:</strong>
+
+      <span
+        *ngIf="task.completed; else incompleted"
+        class="bg-green-700 text-green-100 py-2 px-4 mx-4 rounded-full text-xs font-bolder"
+      >
+        Completed
+      </span>
+
+      <ng-template #incompleted>
+        <span
+          class="bg-red-600 text-red-100 py-2 px-4 rounded-full text-xs font-bolder mx-4"
+        >
+          Pending
+        </span>
+      </ng-template>
+    </p>
+    <p>
+      <strong>Description:</strong>
+      {{ task.description || "No description provided." }}
+    </p>
+    <p class="flex margin--bottom--0">
+      <strong>Due Date:</strong>
+      <span class="ml-2 mr-4 margin--bottom--0">
+        <app-countdown [targetDate]="task.deadline"></app-countdown>
+      </span>
+    </p>
+    <p>
+      <strong>Creator:</strong>
+      {{ task.creator.firstName + " " + task.creator.lastName }}
+    </p>
+    <p><strong>Created At:</strong> {{ task.createdAt | date : "short" }}</p>
+  </div>
+
+  <div class="my-4">
+    <h3 class="font-semibold margin--bottom--0">Assign To:</h3>
+    <ul *ngIf="contributors.length > 0" class="p-2">
+      <li *ngFor="let contributor of contributors" class="border border-white w-[40%] p-2 flex justify-between content-center">
+        {{ contributor.firstName + ' ' + contributor.lastName }}
+        <button
+          (click)="removeContributor(contributor)"
+          class="text-red-500 ml-2"
+        >
+          Remove
+        </button>
+      </li>
+    </ul>
+    <app-add-users 
+      [tasklist]="tasklist" 
+      [task]="task" 
+      (updateTask)="addedMember($event)">
+    </app-add-users>
+  </div>
+
+  <div class="mt-4">
+    <button
+      *ngIf="task.completed == 0; else markAsIncomplete"
+      (click)="markComplete()"
+      class="bg-green-500 text-white py-1 px-4 rounded"
+    >
+      Mark as Complete
+    </button>
+
+    <ng-template #markAsIncomplete>
+      <button
+        (click)="markComplete()"
+        class="bg-red-500 text-white py-1 px-4 rounded"
+      >
+        Mark as Incomplete
+      </button>
+    </ng-template>
+  </div>
+
+  <button
+    (click)="closePanel()"
+    class="absolute top-4 right-4 text-lg text-white"
+  >
+    &times;
+  </button>
+</div>

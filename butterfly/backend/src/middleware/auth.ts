@@ -1,15 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../interfaces/user';
+import { verifyToken } from '../utils/jwt';
+import UserInterface from 'interfaces/user';
 
-const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
-  if (!token) return res.status(401).send('Access Denied');
+declare global {
+  namespace Express {
+    export interface Request {
+      user?: UserInterface;
+    }
+  }
+}
 
-  jwt.verify(token, process.env.JWT_SECRET!, (err, user) => {
-    if (err) return res.status(403).send('Invalid Token');
+const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ message: 'Unauthorized: No token provided' });
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyToken(token);
+
+    if (!decoded) {
+      res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      return;
+    }
+
+    req.user = decoded as UserInterface;
     next();
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export default authenticateToken;
+export default authenticateUser;
